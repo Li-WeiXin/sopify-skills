@@ -1,0 +1,50 @@
+{
+  "evidence": {
+    "command": "python3 -m pytest tests",
+    "committed": false,
+    "compileall": "passed",
+    "cursor_cli": {
+      "analyze_score_gate": "not_executed",
+      "consult_machine_truth_writes": 0,
+      "consult_semantic_routing": "not_clean",
+      "no_space_redirect_denied": true,
+      "no_space_redirect_session": "40d6cbc5-5486-4df8-80bf-bbdb50dc8c19",
+      "status": "partial"
+    },
+    "cursor_ide": {
+      "status": "BLACK_BOX_NOT_VERIFIED"
+    },
+    "diff_check": "passed",
+    "machine_truth_hashes_unchanged": true,
+    "multi_root_session_start": {
+      "automated": "passed",
+      "real_host_black_box": "not_run"
+    },
+    "pushed": false,
+    "pytest": {
+      "passed": 307
+    },
+    "reason_code": null,
+    "result": "passed",
+    "retry_count": 0,
+    "review_result": {
+      "code_quality": "pass_minimal_heuristic_guard",
+      "independent_review_before_fix": "no_p0_p1_three_p2",
+      "spec_compliance": "pass_with_declared_behavior_gaps"
+    },
+    "root_cause": null,
+    "scope": "independent-review P2 fixes: installation wording, multi-root sessionStart selection, no-space shell redirection",
+    "settings_sha256_before_after": "9312893735cb53aa1a8acece3f9adde34dcc8128e3d03c1a72f7ec423344f1e5",
+    "support_tier": "baseline_supported",
+    "verification_source": "project_native_and_cursor_cli"
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:3386c563b18ae7a154a9c980bd10370e27ef30820999c04d1972af645c7accfb",
+    "receipt_id": "verify_002",
+    "source": "implementation_verify"
+  },
+  "timestamp": "2026-08-19T08:02:11+00:00",
+  "verdict": "cursor_baseline_p2_fixed_cli_partial_ide_pending"
+}

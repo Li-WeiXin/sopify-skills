@@ -15,7 +15,7 @@ Sopify adds resumable, traceable AI workflows to any project. After setup:
 
 - Git repository (local or remote)
 - Python 3.11+
-- An AI host: Codex, Claude, Qoder, or Copilot
+- An AI host: Codex, Claude, Qoder, Copilot, or Cursor
 
 ## Quick Setup (One Command)
 
@@ -138,6 +138,25 @@ Copilot reads project-level instruction files across its supported surfaces
 (VS Code Chat, Copilot CLI, Cloud Agent, Code Review — as of May 2025).
 Full trigger wiring (equivalent to Codex/Claude `~go`) is coming in a future
 release.
+
+### Cursor IDE / Cursor Agent CLI
+
+Cursor uses a split installation: a project rule in `.cursor/rules/sopify.mdc`,
+a global Skill/payload tree under `~/.cursor/`, and user-level hooks in
+`~/.cursor/hooks.json`. Run the installer from the target project:
+
+```bash
+python3 scripts/install_sopify.py --target cursor --workspace .
+```
+
+`--workspace` writes the project rule only; it does not create `.sopify`.
+`--with-evidentloop` is not supported for Cursor in this release. The rule is
+valid Cursor `.mdc` with `alwaysApply: true` and a portable Skill path
+`~/.cursor/skills/sopify`. Cursor discovers the same rule surface in its IDE
+and Agent CLI, but discovery is not execution proof. See
+[Cursor host acceptance](./cursor-host.md) for hook boundaries and the
+separate IDE/CLI black-box checks. The current tier remains
+`BASELINE_SUPPORTED`.
 
 ## Verify Setup
 

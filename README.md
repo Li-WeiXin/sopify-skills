@@ -28,7 +28,7 @@ AI coding tools are fast. But when they jump to code before the facts are clear,
 
 Sopify stores plans and verification receipts in `.sopify/` as project files tracked by git. Only the local resume pointers stay out of git. In the same repo, explicitly ask to continue or use `~go` to resume managed work from those files on any supported host.
 
-No new editor, no new CLI. Install into the host you already use — Codex, Claude, Qoder, or Copilot.
+No new editor, no new CLI. Install into the host you already use — Codex, Claude, Qoder, Copilot, or Cursor.
 
 **Design principles:**
 
@@ -137,6 +137,7 @@ Host support:
 | Claude | PROTOCOL_VERIFIED | `claude:en-US` / `claude:zh-CN` | Full capability continuation |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | Validated on Qoder CLI |
 | Copilot | BASELINE_SUPPORTED | `copilot:en-US` / `copilot:zh-CN` | Prompt-only; payload uplift planned |
+| Cursor | BASELINE_SUPPORTED | `cursor` | Local IDE + Agent CLI; project rule, global Skills/payload, and user-level hooks; behavior black-box pending |
 
 Pass `--workspace <path>` to target another repo, `--language <lang>` to control output language.
 

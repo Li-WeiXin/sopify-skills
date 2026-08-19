@@ -16,7 +16,7 @@ Official reference: [`Harness engineering: leveraging Codex in an agent-first wo
 
 Sopify preserves the **process** of AI development — plans, decisions, handoffs, execution evidence, and archival records — as traceable assets. Cross-session and cross-host continuation is the natural result of these assets being portable and verifiable.
 
-The host (Codex, Claude, Qoder, Copilot) executes. Sopify ensures every decision leaves a trace that survives session boundaries, host switches, and team handoffs.
+The host (Codex, Claude, Qoder, Copilot, or Cursor) executes. Sopify ensures every decision leaves a trace that survives session boundaries, host switches, and team handoffs.
 
 **Runtime retired; workflow retained.** The analyze → design → develop → finalize workflow is unchanged. What changed is that workflow rules now live in protocol files and host prompt assets, not in a runtime process.
 
@@ -109,6 +109,7 @@ Layer notes:
 | Claude | PROTOCOL_VERIFIED | `install.sh --target claude:en-US` | Full capability continuation |
 | Qoder | PROTOCOL_VERIFIED | `install.sh --target qoder` | Validated on Qoder CLI |
 | Copilot | BASELINE_SUPPORTED | `install.sh --target copilot` | Prompt-only; payload uplift planned |
+| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor --workspace <path>` | Project rule + global Skills/payload + user-level hooks; IDE/CLI behavior black-box pending |
 
 ## Appendix: Plan Lifecycle
 

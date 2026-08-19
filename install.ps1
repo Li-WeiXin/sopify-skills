@@ -22,7 +22,9 @@ Options:
   --target <host[:lang]> Host and language to install, for example codex:zh-CN
                          or copilot.
   --workspace <path>     For copilot: target project directory (defaults to
-                         current directory). For other hosts: advanced prewarm.
+                         current directory). For cursor: project-rule target
+                         only; does not create `.sopify`. For other hosts:
+                         advanced prewarm.
   --language <lang>      Copilot only: bootstrap output language (en-US/zh-CN).
   --no-copilot           Copilot only: skip Copilot instruction file
                          distribution.

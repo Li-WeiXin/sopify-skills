@@ -28,7 +28,7 @@ AI 工具写代码很快。但在事实没搞清、关键决策还没拍板前�
 
 Sopify 把方案和验证收据保存在 `.sopify/` 中，作为可纳入 git 的项目文件；只有恢复用的本地指针不进 git。在同一个仓库中，明确说“继续”或使用 `~go`，任一受支持的宿主都可以读取这些文件，从上次停点恢复托管任务。
 
-无需新编辑器、无需新 CLI。安装到你已有的宿主：Codex、Claude、Qoder、Copilot 均支持。
+无需新编辑器、无需新 CLI。安装到你已有的宿主：Codex、Claude、Qoder、Copilot、Cursor 均支持。
 
 **设计原则：**
 
@@ -136,6 +136,7 @@ Get-Content sopify-install.ps1 | more
 | Claude | PROTOCOL_VERIFIED | `claude:zh-CN` / `claude:en-US` | 全能力接续 |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | 已在 Qoder CLI 验证 |
 | Copilot | BASELINE_SUPPORTED | `copilot:zh-CN` / `copilot:en-US` | 仅 prompt；payload 升级计划中 |
+| Cursor | BASELINE_SUPPORTED | `cursor` | 本地 IDE + Agent CLI；项目规则、全局 Skills/payload 与用户级 Hooks；行为黑盒待验 |
 
 可用 `--workspace <path>` 指定目标仓库，`--language <lang>` 控制输出语言。
 

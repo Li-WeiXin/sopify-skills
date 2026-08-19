@@ -572,6 +572,17 @@ def _render_distribution_user_result_en(report: DistributionInstallReport) -> st
                 "  2. Type: ~go",
             ]
         )
+    elif _is_project_rules_install(install_result):
+        lines.extend(
+            [
+                f"  Project rule: {_project_rule_path(install_result)}",
+                "  No .sopify workspace state was initialized.",
+                "",
+                "Next:",
+                f"  1. Reopen {host_name} in that project.",
+                "  2. The rule is installed with alwaysApply: true; confirm it under Cursor Settings > Rules before relying on it.",
+            ]
+        )
     else:
         lines.extend(
             [
@@ -627,6 +638,17 @@ def _render_distribution_user_result_zh(report: DistributionInstallReport) -> st
                 "下一步：",
                 f"  1. 在项目目录打开 {host_name}。",
                 "  2. 输入：~go",
+            ]
+        )
+    elif _is_project_rules_install(install_result):
+        lines.extend(
+            [
+                f"  项目规则：{_project_rule_path(install_result)}",
+                "  未初始化 .sopify 工作区状态。",
+                "",
+                "下一步：",
+                f"  1. 在该项目中重新打开 {host_name}。",
+                "  2. 规则已按 alwaysApply: true 安装；使用前请在 Cursor Settings > Rules 中确认。",
             ]
         )
     else:
@@ -769,7 +791,26 @@ def _select_host_checks(payload: dict[str, object], target: InstallTarget) -> tu
 def _render_workspace_line(install_result: InstallResult) -> str:
     if install_result.workspace_root is None:
         return "will bootstrap on first project trigger"
+    if _is_project_rules_install(install_result):
+        return f"project rule installed at {_project_rule_path(install_result)}"
     return f"pre-warmed at {install_result.workspace_root}"
+
+
+def _is_project_rules_install(install_result: InstallResult) -> bool:
+    try:
+        return get_host_adapter(install_result.target.host).is_project_rules_scope
+    except ValueError:
+        return False
+
+
+def _project_rule_path(install_result: InstallResult) -> Path:
+    if install_result.workspace_root is None:
+        raise ValueError("Project-rules installation requires a workspace root")
+    adapter = get_host_adapter(install_result.target.host)
+    paths = adapter.workspace_expected_paths(install_result.workspace_root)
+    if not paths:
+        raise ValueError("Project-rules installation did not declare a rule path")
+    return paths[0]
 
 
 def _workspace_bootstrap_action(install_result: InstallResult) -> str:

@@ -213,6 +213,40 @@ class DistributionFacadeTests(unittest.TestCase):
             self.assertIn("workspace outcome: stub_selected [continue]", rendered)
             self.assertIn("workspace bundle: pass (STUB_SELECTED)", rendered)
 
+    def test_cursor_distribution_reports_project_rule_without_prewarm(self) -> None:
+        with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
+            home_root = Path(home_dir)
+            workspace_root = Path(workspace_dir)
+            request = DistributionRequest(
+                target="cursor:zh-CN",
+                workspace=str(workspace_root),
+                ref_override=None,
+                interactive=False,
+                source_channel="repo-local",
+                source_metadata=DistributionSourceMetadata(
+                    resolved_ref="working-tree",
+                    asset_name="scripts/install_sopify.py",
+                ),
+            )
+
+            report = run_distribution_install(
+                request=request,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+                install_executor=run_install,
+            )
+
+            rendered = render_distribution_user_result(report)
+            rule_path = workspace_root.resolve() / ".cursor" / "rules" / "sopify.mdc"
+            self.assertIn(f"项目规则：{rule_path}", rendered)
+            self.assertIn("未初始化 .sopify 工作区状态", rendered)
+            self.assertIn("使用前请在 Cursor Settings > Rules 中确认", rendered)
+            self.assertNotIn("项目规则会自动加载", rendered)
+            self.assertNotIn("已预热", rendered)
+            verbose = render_distribution_result(report)
+            self.assertIn(f"workspace: project rule installed at {rule_path}", verbose)
+            self.assertNotIn("workspace: pre-warmed", verbose)
+
     def test_distribution_install_rejects_ambiguous_nested_workspace_prewarm(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as repo_dir:
             home_root = Path(home_dir)

@@ -27,6 +27,7 @@ from installer.evidentloop import (
     install_evidentloop_companion,
     prepare_evidentloop_install,
 )
+from installer.cursor_hooks import install_cursor_user_hooks, preflight_cursor_user_hooks
 from installer.hosts import get_host_adapter, iter_host_registrations, iter_installable_hosts
 from installer.hosts.base import HostAdapter, install_host_assets
 from installer.models import BootstrapResult, EvidentLoopInstallResult, InstallError, InstallPhaseResult, InstallResult, LANGUAGE_DIRECTORY_MAP, parse_install_target
@@ -70,10 +71,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--workspace",
         default=None,
         help=(
-            "For workspace-scope hosts (e.g. copilot): bootstrap this workspace now "
-            "(defaults to current directory when omitted). "
-            "For other hosts: advanced prewarm path. Most users should omit this and let `~go` initialize "
-            "project files on first use."
+            "For Copilot: bootstrap this workspace now (defaults to current directory). "
+            "For Cursor: write the project rule into this workspace (defaults to current directory); "
+            "this does not create `.sopify`. "
+            "For Codex / Claude / Qoder: advanced prewarm path. Most of those users should omit this."
         ),
     )
     parser.add_argument("--language", choices=("en-US", "zh-CN"), default=None, help="Override output language for bare targets.")
@@ -109,7 +110,11 @@ def run_install(
     target = parse_install_target(target_value)
     workspace_root = Path(workspace_value).expanduser().resolve() if workspace_value is not None else None
     adapter = get_host_adapter(target.host)
-    if adapter.is_workspace_scope and workspace_root is None:
+    if with_evidentloop and adapter.skills_cli_agent is None:
+        raise InstallError(
+            f"Host '{adapter.host_name}' does not support --with-evidentloop in this release."
+        )
+    if adapter.requires_workspace and workspace_root is None:
         workspace_root = Path.cwd().resolve()
     if workspace_root is not None and not workspace_root.exists():
         raise InstallError(f"Workspace does not exist: {workspace_root}")
@@ -117,6 +122,8 @@ def run_install(
         raise InstallError(f"Workspace is not a directory: {workspace_root}")
 
     resolved_home = (home_root or Path.home()).expanduser().resolve()
+    if adapter.host_name == "cursor":
+        preflight_cursor_user_hooks(home_root=resolved_home)
     if adapter.is_workspace_scope:
         # Workspace-scope hosts (e.g. Copilot): render single file to workspace,
         # skip payload install and workspace bootstrap.
@@ -156,14 +163,27 @@ def run_install(
         repo_root=repo_root,
         home_root=resolved_home,
         language_directory=target.language_directory,
+        workspace_root=workspace_root,
     )
     payload_install = install_global_payload(adapter, repo_root=repo_root, home_root=resolved_home)
     verified_host_paths = validate_host_install(adapter, home_root=resolved_home)
+    if adapter.requires_workspace:
+        workspace_paths = adapter.workspace_expected_paths(workspace_root)
+        missing_workspace_paths = [path for path in workspace_paths if not path.exists()]
+        if missing_workspace_paths:
+            raise InstallError(f"Host install verification failed: {missing_workspace_paths[0]}")
+        verified_host_paths = tuple(dict.fromkeys((*verified_host_paths, *workspace_paths)))
     verified_payload_paths = validate_payload_install(payload_install.root)
+    if adapter.host_name == "cursor":
+        hook_path = install_cursor_user_hooks(
+            home_root=resolved_home,
+            payload_root=payload_install.root,
+        )
+        verified_host_paths = tuple(dict.fromkeys((*verified_host_paths, hook_path)))
 
     workspace_bootstrap: BootstrapResult | None = None
     bundle_root: Path | None = None
-    if workspace_root is not None:
+    if workspace_root is not None and not adapter.is_project_rules_scope:
         workspace_bootstrap = run_workspace_bootstrap(payload_install.root, workspace_root)
         bundle_root = workspace_bootstrap.bundle_root
         validate_workspace_stub_manifest(workspace_root / ".sopify")

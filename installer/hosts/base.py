@@ -18,6 +18,7 @@ _MANAGED_BLOCK_END = "<!-- END SOPIFY MANAGED BLOCK -->"
 
 INSTRUCTION_SURFACE_HEADER_EMBEDDED = "header_embedded"
 INSTRUCTION_SURFACE_SINGLE_FILE = "single_file"
+INSTRUCTION_SURFACE_PROJECT_RULES = "project_rules"
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,7 @@ class HostAdapter:
     config_dir: str | None = None
     instruction_surface: str = field(default=INSTRUCTION_SURFACE_HEADER_EMBEDDED)
     instruction_file_relpath: str | None = field(default=None)
+    instruction_source_relpath: str | None = field(default=None)
     default_language: str | None = field(default=None)
     skills_cli_agent: str | None = field(default=None)
     skill_install_dirname: str | None = field(default=None)
@@ -38,8 +40,25 @@ class HostAdapter:
     def is_workspace_scope(self) -> bool:
         return self.instruction_surface == INSTRUCTION_SURFACE_SINGLE_FILE
 
+    @property
+    def is_project_rules_scope(self) -> bool:
+        return self.instruction_surface == INSTRUCTION_SURFACE_PROJECT_RULES
+
+    @property
+    def requires_workspace(self) -> bool:
+        """Whether installation needs a project root for its instruction surface."""
+        return self.is_workspace_scope or self.is_project_rules_scope
+
     def source_root(self, repo_root: Path, language_directory: str) -> Path:
         return repo_root / "skills" / language_to_source_dir(language_directory)
+
+    def instruction_source(self, repo_root: Path, language_directory: str) -> Path:
+        """Return the source asset for this host's instruction surface."""
+        source_root = self.source_root(repo_root, language_directory)
+        if self.instruction_source_relpath is not None:
+            return source_root / self.instruction_source_relpath
+        template = source_root / HEADER_TEMPLATE_NAME
+        return template if template.is_file() else source_root / self.header_filename
 
     def destination_root(self, home_root: Path) -> Path:
         return home_root / self.destination_dirname
@@ -54,6 +73,16 @@ class HostAdapter:
             if self.instruction_file_relpath is not None:
                 paths.append(home_root / self.instruction_file_relpath)
             return tuple(paths)
+        if self.is_project_rules_scope:
+            skills_root = root / "skills" / "sopify"
+            return (
+                skills_root / "analyze" / "SKILL.md",
+                skills_root / "design" / "SKILL.md",
+                skills_root / "develop" / "SKILL.md",
+                skills_root / "kb" / "SKILL.md",
+                skills_root / "templates" / "SKILL.md",
+                skills_root / "references" / "shared-writing-dna.md",
+            )
         return (
             root / self.header_filename,
             root / "skills" / "sopify" / "analyze" / "SKILL.md",
@@ -62,6 +91,8 @@ class HostAdapter:
 
     def workspace_expected_paths(self, workspace_root: Path) -> tuple[Path, ...]:
         """Expected output paths relative to workspace root (workspace-scope hosts only)."""
+        if self.is_project_rules_scope and self.instruction_file_relpath is not None:
+            return (workspace_root / self.instruction_file_relpath,)
         paths: list[Path] = [workspace_root / self.destination_dirname / self.header_filename]
         if self.instruction_file_relpath is not None:
             paths.append(workspace_root / self.instruction_file_relpath)
@@ -135,6 +166,14 @@ def install_host_assets(
             workspace_root=workspace_root,
             language_directory=language_directory,
         )
+    if adapter.is_project_rules_scope:
+        return _install_project_rules_assets(
+            adapter,
+            repo_root=repo_root,
+            home_root=home_root,
+            workspace_root=workspace_root,
+            language_directory=language_directory,
+        )
     return _install_home_host_assets(
         adapter,
         repo_root=repo_root,
@@ -152,9 +191,7 @@ def _install_home_host_assets(
 ) -> InstallPhaseResult:
     """Install header + skills tree to home directory (Claude/Codex path)."""
     source_root = adapter.source_root(repo_root, language_directory)
-    header_template = source_root / HEADER_TEMPLATE_NAME
-    # Fallback to old-style header if template doesn't exist
-    header_source = header_template if header_template.is_file() else source_root / adapter.header_filename
+    header_source = adapter.instruction_source(repo_root, language_directory)
     skills_source = source_root / "skills" / "sopify"
     if not header_source.is_file():
         raise InstallError(f"Missing source header file: {header_source}")
@@ -192,6 +229,62 @@ def _install_home_host_assets(
         root=destination_root,
         version=source_version,
         paths=adapter.expected_paths(home_root),
+    )
+
+
+def _install_project_rules_assets(
+    adapter: HostAdapter,
+    *,
+    repo_root: Path,
+    home_root: Path,
+    workspace_root: Path | None,
+    language_directory: str,
+) -> InstallPhaseResult:
+    """Install a thin project rule plus the host's global recursive Skill tree."""
+    if workspace_root is None:
+        raise InstallError(
+            f"Host '{adapter.host_name}' requires --workspace for project-rule rendering"
+        )
+    if adapter.instruction_file_relpath is None:
+        raise InstallError(f"Host '{adapter.host_name}' has no project rule path")
+
+    rule_source = adapter.instruction_source(repo_root, language_directory)
+    skills_source = adapter.source_root(repo_root, language_directory) / "skills" / "sopify"
+    if not rule_source.is_file():
+        raise InstallError(f"Missing source project rule: {rule_source}")
+    if not skills_source.is_dir():
+        raise InstallError(f"Missing source skills directory: {skills_source}")
+
+    source_version = read_sopify_version(rule_source)
+    rule_destination = workspace_root / adapter.instruction_file_relpath
+    full_rule = render_project_rule(rule_source, adapter, home_root=home_root)
+    skills_destination = adapter.destination_root(home_root) / "skills" / "sopify"
+    expected_paths = adapter.expected_paths(home_root)
+    if (
+        rule_destination.is_file()
+        and rule_destination.read_text(encoding="utf-8") == full_rule
+        and all(path.exists() for path in expected_paths)
+    ):
+        return InstallPhaseResult(
+            action="skipped",
+            root=adapter.destination_root(home_root),
+            version=source_version,
+            paths=tuple(dict.fromkeys((*adapter.workspace_expected_paths(workspace_root), *expected_paths))),
+        )
+
+    action = "updated" if rule_destination.exists() or skills_destination.exists() else "installed"
+    rule_destination.parent.mkdir(parents=True, exist_ok=True)
+    rule_destination.write_text(full_rule, encoding="utf-8")
+    if skills_destination.exists():
+        shutil.rmtree(skills_destination)
+    skills_destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(skills_source, skills_destination, ignore=_IGNORE_PATTERNS)
+
+    return InstallPhaseResult(
+        action=action,
+        root=adapter.destination_root(home_root),
+        version=source_version,
+        paths=tuple(dict.fromkeys((*adapter.workspace_expected_paths(workspace_root), *expected_paths))),
     )
 
 
@@ -345,6 +438,18 @@ def _render_header(source: Path, destination: Path, adapter: HostAdapter) -> Non
     else:
         content = content.replace("{{config_dir}}", "")
     destination.write_text(content, encoding="utf-8")
+
+
+def render_project_rule(source: Path, adapter: HostAdapter, *, home_root: Path) -> str:
+    """Render a Cursor-style project rule with a portable user-directory Skill path."""
+    del home_root
+    content = source.read_text(encoding="utf-8")
+    content = content.replace("{{config_dir}}", adapter.config_dir or "")
+    if adapter.skill_install_dirname is None:
+        raise InstallError(f"Host '{adapter.host_name}' has no global Skill install path")
+    global_skill_root = f"~/{adapter.skill_install_dirname}/sopify"
+    content = content.replace("{{skills_root}}", global_skill_root)
+    return content.rstrip("\n") + "\n"
 
 
 def _write_managed_block(path: Path, content: str) -> bool:

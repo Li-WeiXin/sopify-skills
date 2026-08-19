@@ -1,0 +1,25 @@
+{
+  "evidence": {
+    "decision": "accept_with_modifications",
+    "modifications": [
+      "user_level_hooks_json",
+      "enable_only_when_project_rule_present",
+      "helper_fail_open",
+      "session_start_non_resume_clause",
+      "pretooluse_no_narrow_matcher",
+      "before_shell_execution",
+      "fix_baseline_audit_findings",
+      "keep_baseline_supported"
+    ],
+    "required_host_action_was": "confirm_decision"
+  },
+  "provenance": {
+    "host": "cursor",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:52de3f2cb9a976b28201b1fe978c05c6dae0268fb8a64724b27623a398e21518",
+    "receipt_id": "exec_001",
+    "source": "user_decision"
+  },
+  "timestamp": "2026-08-19T06:08:17+00:00",
+  "verdict": "decision_accepted_with_modifications"
+}

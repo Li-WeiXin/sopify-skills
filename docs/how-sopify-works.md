@@ -16,7 +16,7 @@ Sopify 借鉴 harness engineering 的设计思路，但不把它作为仓库首�
 
 Sopify 把 AI 开发过程中的**方案、决策、交接、执行/验证证据和归档记录**沉淀为可追溯资产。跨 session、跨宿主的接续是这些资产可携带、可验证后的自然结果。
 
-宿主（Codex、Claude、Qoder、Copilot）负责执行。Sopify 确保每个决策都留下痕迹，且这些痕迹能跨越 session 边界、宿主切换和团队交接。
+宿主（Codex、Claude、Qoder、Copilot、Cursor）负责执行。Sopify 确保每个决策都留下痕迹，且这些痕迹能跨越 session 边界、宿主切换和团队交接。
 
 **Runtime 已退场；工作流保留。** analyze → design → develop → finalize 的默认工作流不变。变化的是：工作流规则现在活在协议文件和宿主 prompt 资产里，而不是 runtime 进程里。
 
@@ -109,6 +109,7 @@ Sopify 不默认安装或运行验证器。只用 Sopify、使用其他 Verifier
 | Claude | PROTOCOL_VERIFIED | `install.sh --target claude:zh-CN` | 全能力接续 |
 | Qoder | PROTOCOL_VERIFIED | `install.sh --target qoder` | 已在 Qoder CLI 验证 |
 | Copilot | BASELINE_SUPPORTED | `install.sh --target copilot` | 仅 prompt；payload 升级计划中 |
+| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor --workspace <path>` | 项目规则 + 全局 Skills/payload + 用户级 Hooks；IDE/CLI 行为黑盒待验 |
 
 ## 附录：Plan 生命周期
 

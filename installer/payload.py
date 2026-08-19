@@ -20,6 +20,7 @@ PAYLOAD_MANIFEST_FILENAME = "payload-manifest.json"
 PAYLOAD_DIRNAME = "sopify"
 PAYLOAD_BUNDLES_RELATIVE_PATH = Path("bundles")
 PAYLOAD_HELPER_RELATIVE_PATH = Path("helpers") / "bootstrap_workspace.py"
+CURSOR_HOOK_HELPER_RELATIVE_PATH = Path("helpers") / "cursor_hook.py"
 PAYLOAD_INSTRUCTION_RESOURCES_DIR = Path("resources")
 _REQUIRED_BUNDLE_CAPABILITIES = {
     "bundle_role": "control_plane",
@@ -41,6 +42,8 @@ def install_global_payload(
 
     if _payload_is_current(payload_root, desired_version):
         resources_changed = _ensure_workspace_instruction_resources(repo_root=repo_root, payload_root=payload_root)
+        if adapter.host_name == "cursor":
+            resources_changed = _install_cursor_hook_helper(repo_root=repo_root, payload_root=payload_root) or resources_changed
         return InstallPhaseResult(
             action="updated" if resources_changed else "skipped",
             root=payload_root,
@@ -55,6 +58,8 @@ def install_global_payload(
         desired_bundle_version=desired_version,
     )
     _install_bootstrap_helper(repo_root=repo_root, payload_root=payload_root)
+    if adapter.host_name == "cursor":
+        _install_cursor_hook_helper(repo_root=repo_root, payload_root=payload_root)
     _install_workspace_instruction_resources(repo_root=repo_root, payload_root=payload_root)
     _write_payload_manifest(payload_root=payload_root, bundle_root=bundle_root, payload_version=desired_version)
     return InstallPhaseResult(
@@ -131,12 +136,7 @@ def _payload_is_current(payload_root: Path, desired_version: str | None) -> bool
 
 def _source_payload_version(adapter: HostAdapter, repo_root: Path) -> str | None:
     language_directory = "CN"
-    source = adapter.source_root(repo_root, language_directory)
-    # Prefer template; fall back to host-specific header
-    header_path = source / HEADER_TEMPLATE_NAME
-    if not header_path.is_file():
-        header_path = source / adapter.header_filename
-    return read_sopify_version(header_path)
+    return read_sopify_version(adapter.instruction_source(repo_root, language_directory))
 
 
 def _install_bootstrap_helper(*, repo_root: Path, payload_root: Path) -> Path:
@@ -148,6 +148,20 @@ def _install_bootstrap_helper(*, repo_root: Path, payload_root: Path) -> Path:
     shutil.copy2(helper_source, helper_target)
     helper_target.chmod(0o755)
     return helper_target
+
+
+def _install_cursor_hook_helper(*, repo_root: Path, payload_root: Path) -> bool:
+    helper_source = repo_root / "installer" / "cursor_hook.py"
+    if not helper_source.is_file():
+        raise InstallError(f"Missing Cursor hook helper source: {helper_source}")
+    helper_target = payload_root / CURSOR_HOOK_HELPER_RELATIVE_PATH
+    desired = helper_source.read_bytes()
+    if helper_target.is_file() and helper_target.read_bytes() == desired:
+        return False
+    helper_target.parent.mkdir(parents=True, exist_ok=True)
+    helper_target.write_bytes(desired)
+    helper_target.chmod(0o755)
+    return True
 
 
 def _install_workspace_instruction_resources(*, repo_root: Path, payload_root: Path) -> None:

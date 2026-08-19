@@ -15,6 +15,7 @@ from installer.bootstrap_workspace import (
     _classify_workspace_bundle,
     _resolve_selected_payload_bundle,
 )
+from installer.cursor_hooks import sopify_hook_entries_present, sopify_hooks_are_present
 from installer.hosts import iter_host_registrations
 from installer.hosts.base import HostAdapter, HostRegistration
 from installer.models import HostCapability, InstallError
@@ -148,6 +149,10 @@ class HostInspection:
     workspace_bundle: InspectionCheck
     handoff_first: InspectionCheck
     smoke: InspectionCheck
+    global_skill_tree: InspectionCheck | None = None
+    user_hooks: InspectionCheck | None = None
+    ide_behavior: InspectionCheck | None = None
+    cli_behavior: InspectionCheck | None = None
 
     @property
     def capability(self) -> HostCapability:
@@ -171,11 +176,28 @@ class HostInspection:
                 },
             }
         configured = self.payload.status == CHECK_PASS
+        if self.adapter.is_project_rules_scope:
+            skill_ok = self.global_skill_tree is not None and self.global_skill_tree.status == CHECK_PASS
+            if self.host_prompt.reason_code == REASON_WORKSPACE_NOT_REQUESTED:
+                installed = skill_ok
+            else:
+                installed = skill_ok and self.host_prompt.status == CHECK_PASS
+            return {
+                **self.capability.to_dict(),
+                "state": {
+                    "installed": STATUS_YES if installed else STATUS_NO,
+                    "configured": STATUS_YES if configured else STATUS_NO,
+                    "workspace_bundle_healthy": STATUS_NOT_REQUESTED,
+                },
+                "payload_bundle": self.payload_bundle.to_status_dict(),
+                "workspace_bundle": self.workspace_bundle.to_dict(),
+            }
+        installed = self.host_prompt.status == CHECK_PASS
         workspace_bundle_healthy = _check_state_value(self.workspace_bundle)
         return {
             **self.capability.to_dict(),
             "state": {
-                "installed": STATUS_YES if self.host_prompt.status == CHECK_PASS else STATUS_NO,
+                "installed": STATUS_YES if installed else STATUS_NO,
                 "configured": STATUS_YES if configured else STATUS_NO,
                 "workspace_bundle_healthy": workspace_bundle_healthy,
             },
@@ -186,13 +208,17 @@ class HostInspection:
     def doctor_checks(self) -> tuple[InspectionCheck, ...]:
         if self.adapter.is_workspace_scope:
             return (self.host_prompt,)
-        return (
+        checks: list[InspectionCheck] = [
             self.host_prompt,
             self.payload,
             self.payload_bundle.to_check(host_id=self.capability.host_id),
-            self.workspace_bundle,
-            self.handoff_first,
-        )
+        ]
+        if not self.adapter.is_project_rules_scope:
+            checks.extend((self.workspace_bundle, self.handoff_first))
+        for check in (self.global_skill_tree, self.user_hooks, self.ide_behavior, self.cli_behavior):
+            if check is not None:
+                checks.append(check)
+        return tuple(checks)
 
 
 def classify_workspace_version_state(
@@ -252,9 +278,10 @@ def inspect_host(
     adapter = registration.adapter
     capability = registration.capability
     if _host_is_absent(adapter=adapter, home_root=home_root, workspace_root=workspace_root):
+        project_rule_check_id = "project_rule_present" if adapter.is_project_rules_scope else "host_prompt_present"
         skipped = InspectionCheck(
             host_id=capability.host_id,
-            check_id="host_prompt_present",
+            check_id=project_rule_check_id,
             status=CHECK_SKIP,
             reason_code=REASON_OK,
             recommendation=f"Install Sopify for {capability.host_id} to enable host-local diagnostics.",
@@ -294,24 +321,51 @@ def inspect_host(
                 status=CHECK_SKIP,
                 reason_code=REASON_OK,
             ),
+            global_skill_tree=_cursor_not_verified_check(
+                capability=capability,
+                check_id="global_skill_tree_present",
+                reason_code="HOST_NOT_INSTALLED",
+            ) if adapter.is_project_rules_scope else None,
+            user_hooks=_cursor_not_verified_check(
+                capability=capability,
+                check_id="cursor_hooks_present",
+                reason_code="HOST_NOT_INSTALLED",
+            ) if adapter.host_name == "cursor" else None,
+            ide_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_ide_behavior") if adapter.host_name == "cursor" else None,
+            cli_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_cli_behavior") if adapter.host_name == "cursor" else None,
         )
     host_prompt = _inspect_host_prompt(adapter=adapter, capability=capability, home_root=home_root, workspace_root=workspace_root)
     payload = _inspect_payload(adapter=adapter, capability=capability, home_root=home_root)
+    global_skill_tree = (
+        _inspect_global_skill_tree(adapter=adapter, capability=capability, home_root=home_root)
+        if adapter.is_project_rules_scope
+        else None
+    )
+    user_hooks = (
+        _inspect_cursor_hooks(adapter=adapter, capability=capability, home_root=home_root)
+        if adapter.host_name == "cursor"
+        else None
+    )
     payload_bundle = inspect_payload_bundle_resolution(payload_root=adapter.payload_root(home_root), host_id=capability.host_id)
-    if workspace_root is None:
+    if workspace_root is None or adapter.is_project_rules_scope:
+        workspace_recommendation = (
+            "Cursor does not auto-bootstrap `.sopify`. Trigger Sopify in the project to bootstrap on demand."
+            if adapter.is_project_rules_scope
+            else "Workspace bootstrap was not requested. Trigger Sopify in a project workspace to bootstrap on demand."
+        )
         workspace_bundle = InspectionCheck(
             host_id=capability.host_id,
             check_id="workspace_bundle_manifest",
             status=CHECK_SKIP,
             reason_code=REASON_WORKSPACE_NOT_REQUESTED,
-            recommendation="Workspace bootstrap was not requested. Trigger Sopify in a project workspace to bootstrap on demand.",
+            recommendation=workspace_recommendation,
         )
         handoff_first = InspectionCheck(
             host_id=capability.host_id,
             check_id="workspace_handoff_first",
             status=CHECK_SKIP,
             reason_code=REASON_WORKSPACE_NOT_REQUESTED,
-            recommendation="Trigger Sopify in a project workspace to bootstrap on demand.",
+            recommendation=workspace_recommendation,
         )
         smoke = _inspect_smoke(
             adapter=adapter,
@@ -327,6 +381,10 @@ def inspect_host(
             workspace_bundle=workspace_bundle,
             handoff_first=handoff_first,
             smoke=smoke,
+            global_skill_tree=global_skill_tree,
+            user_hooks=user_hooks,
+            ide_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_ide_behavior") if adapter.host_name == "cursor" else None,
+            cli_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_cli_behavior") if adapter.host_name == "cursor" else None,
         )
     workspace_bundle = _inspect_workspace_bundle(
         adapter=adapter,
@@ -362,6 +420,10 @@ def inspect_host(
         workspace_bundle=workspace_bundle,
         handoff_first=handoff_first,
         smoke=smoke,
+        global_skill_tree=global_skill_tree,
+        user_hooks=user_hooks,
+        ide_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_ide_behavior") if adapter.host_name == "cursor" else None,
+        cli_behavior=_cursor_behavior_check(capability=capability, check_id="cursor_cli_behavior") if adapter.host_name == "cursor" else None,
     )
 
 
@@ -671,8 +733,17 @@ def _protocol_state_checks(workspace_state: dict[str, object]) -> tuple[Inspecti
 
 
 def _inspect_host_prompt(*, adapter: HostAdapter, capability: HostCapability, home_root: Path, workspace_root: Path | None = None) -> InspectionCheck:
+    check_id = "project_rule_present" if adapter.is_project_rules_scope else "host_prompt_present"
+    if adapter.is_project_rules_scope and workspace_root is None:
+        return InspectionCheck(
+            host_id=capability.host_id,
+            check_id=check_id,
+            status=CHECK_SKIP,
+            reason_code=REASON_WORKSPACE_NOT_REQUESTED,
+            recommendation="Pass --workspace-root to verify the Cursor project rule in a specific repository.",
+        )
     try:
-        if adapter.is_workspace_scope:
+        if adapter.requires_workspace:
             if workspace_root is None:
                 raise InstallError("Workspace-scope host requires --workspace for verification")
             paths = adapter.workspace_expected_paths(workspace_root)
@@ -683,7 +754,7 @@ def _inspect_host_prompt(*, adapter: HostAdapter, capability: HostCapability, ho
             paths = validate_host_install(adapter, home_root=home_root)
         return InspectionCheck(
             host_id=capability.host_id,
-            check_id="host_prompt_present",
+            check_id=check_id,
             status=CHECK_PASS,
             reason_code=REASON_OK,
             evidence=tuple(str(path) for path in paths),
@@ -691,12 +762,88 @@ def _inspect_host_prompt(*, adapter: HostAdapter, capability: HostCapability, ho
     except InstallError as exc:
         return InspectionCheck(
             host_id=capability.host_id,
-            check_id="host_prompt_present",
+            check_id=check_id,
             status=CHECK_FAIL,
             reason_code=_reason_code_from_install_error(exc),
             evidence=_paths_from_error(exc),
             recommendation=f"Run python3 scripts/install_sopify.py --target {_recommend_target(capability.host_id)} to install the host prompt layer.",
         )
+
+
+def _inspect_cursor_hooks(*, adapter: HostAdapter, capability: HostCapability, home_root: Path) -> InspectionCheck:
+    present, detail = sopify_hooks_are_present(
+        home_root=home_root,
+        payload_root=adapter.payload_root(home_root),
+    )
+    if present:
+        return InspectionCheck(
+            host_id=capability.host_id,
+            check_id="cursor_hooks_present",
+            status=CHECK_PASS,
+            reason_code=REASON_OK,
+            evidence=(str(adapter.payload_root(home_root) / "helpers" / "cursor_hook.py"),),
+        )
+    return InspectionCheck(
+        host_id=capability.host_id,
+        check_id="cursor_hooks_present",
+        status=CHECK_FAIL,
+        reason_code="MISSING_REQUIRED_FILE",
+        evidence=(detail,) if detail else (),
+        recommendation=(
+            f"Run python3 scripts/install_sopify.py --target {_recommend_target(capability.host_id)} "
+            "to install the user-level Cursor hooks and helper."
+        ),
+    )
+
+
+def _inspect_global_skill_tree(*, adapter: HostAdapter, capability: HostCapability, home_root: Path) -> InspectionCheck:
+    try:
+        paths = validate_host_install(adapter, home_root=home_root)
+        return InspectionCheck(
+            host_id=capability.host_id,
+            check_id="global_skill_tree_present",
+            status=CHECK_PASS,
+            reason_code=REASON_OK,
+            evidence=tuple(str(path) for path in paths),
+        )
+    except InstallError as exc:
+        return _cursor_not_verified_check(
+            capability=capability,
+            check_id="global_skill_tree_present",
+            reason_code=_reason_code_from_install_error(exc),
+            evidence=_paths_from_error(exc),
+            recommendation=f"Run python3 scripts/install_sopify.py --target {_recommend_target(capability.host_id)} to install the global Cursor Skill tree.",
+            status=CHECK_FAIL,
+        )
+
+
+def _cursor_not_verified_check(
+    *,
+    capability: HostCapability,
+    check_id: str,
+    reason_code: str,
+    evidence: tuple[str, ...] = (),
+    recommendation: str | None = None,
+    status: str = CHECK_SKIP,
+) -> InspectionCheck:
+    return InspectionCheck(
+        host_id=capability.host_id,
+        check_id=check_id,
+        status=status,
+        reason_code=reason_code,
+        evidence=evidence,
+        recommendation=recommendation,
+    )
+
+
+def _cursor_behavior_check(*, capability: HostCapability, check_id: str) -> InspectionCheck:
+    surface = "Cursor IDE" if check_id == "cursor_ide_behavior" else "Cursor Agent CLI"
+    return _cursor_not_verified_check(
+        capability=capability,
+        check_id=check_id,
+        reason_code="BLACK_BOX_NOT_VERIFIED",
+        recommendation=f"Run the {surface} black-box acceptance flow; file presence alone is not behavior evidence.",
+    )
 
 
 def _inspect_payload(*, adapter: HostAdapter, capability: HostCapability, home_root: Path) -> InspectionCheck:
@@ -1164,4 +1311,14 @@ def _host_is_absent(*, adapter: HostAdapter, home_root: Path, workspace_root: Pa
         if workspace_root is None:
             return True
         return not any(p.exists() for p in adapter.workspace_expected_paths(workspace_root))
+    if adapter.is_project_rules_scope:
+        owned = [
+            *adapter.expected_paths(home_root),
+            adapter.payload_root(home_root),
+        ]
+        if workspace_root is not None:
+            owned.extend(adapter.workspace_expected_paths(workspace_root))
+        return not any(path.exists() for path in owned) and not (
+            adapter.host_name == "cursor" and sopify_hook_entries_present(home_root=home_root)
+        )
     return not adapter.destination_root(home_root).exists() and not adapter.payload_root(home_root).exists()
