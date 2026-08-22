@@ -122,11 +122,11 @@ grep "SourceChannel\|SourceRef" "$OUT_DIR/install.ps1"
 ```bash
 # 快速验证（推荐）
 HOME="$(mktemp -d)" bash -c \
-  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target codex:zh-CN'
+  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target codex:zh-CN --verbose'
 
 # 本次 release 包含 Cursor 变更时，再验证 Cursor
 HOME="$(mktemp -d)" bash -c \
-  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:zh-CN'
+  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:zh-CN --verbose'
 ```
 
 或用 smoke 脚本：
@@ -135,7 +135,7 @@ HOME="$(mktemp -d)" bash -c \
 python3 scripts/check-install-payload-bundle-smoke.py --target codex:zh-CN
 ```
 
-安装输出里必须出现：
+默认安装输出保持精简；发布 smoke 使用 `--verbose`，输出里必须出现：
 
 ```
 source channel: stable
@@ -168,7 +168,7 @@ git push
 
 ## 故障排查
 
-**上传了未渲染的 `install.sh`**：立即在 Release 页删除该 asset，重新渲染后上传。安装输出 `source channel: dev` 的用户需重新安装。
+**上传了未渲染的 `install.sh`**：立即在 Release 页删除该 asset，重新渲染后上传。`--verbose` 输出为 `source channel: dev` 时，需修复 asset 并重新安装。
 
 **smoke 失败**：确认 Release 不是 draft、asset 文件名大小写正确（`install.sh`）、已勾选 "Set as the latest release"。
 
@@ -195,6 +195,6 @@ python3 scripts/render-release-installers.py --release-tag "$TAG" --output-dir "
 
 # 5. smoke
 HOME="$(mktemp -d)" bash -c \
-  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target codex:zh-CN'
+  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target codex:zh-CN --verbose'
 # 确认：source channel: stable，resolved source ref: $TAG
 ```
