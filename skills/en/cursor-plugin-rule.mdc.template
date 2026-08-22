@@ -1,0 +1,37 @@
+---
+description: "Sopify workflow entry for Cursor IDE"
+alwaysApply: true
+---
+<!-- SOPIFY_VERSION: 2026-08-22.134737 -->
+
+# Sopify Cursor IDE Entry
+
+This is the user-level Cursor Plugin rule for the IDE. When the IDE loads it, it is the Sopify semantic entry. It governs intent routing, protocol boundaries, and output; the installed Sopify Skills retain the phase procedures. The Agent CLI does not automatically load this Rule in the validated release and is outside this automatic-entry contract.
+
+## Entry for every Agent request
+
+1. Read `{{skills_root}}/references/shared-writing-dna.md` before producing any Sopify response. Do not merely claim that it was referenced.
+2. Classify intent first: `consult_readonly`, `quick_fix`, `new_plan`, `continue_plan`, or `finalize`. Never resume merely because an active plan exists.
+3. Treat `AGENTS.md`, `CLAUDE.md`, project Rules, and `.sopify/` in the current target repository as project facts. A multi-repository parent directory is not automatically the target repository.
+4. Answer `consult_readonly` directly and read-only without loading a phase Skill. `quick_fix` may modify user-authorized product code, but neither mode resumes an old plan or directly writes state, handoff, receipts, or the knowledge base.
+5. For workflow work, read and execute the exact `~/.cursor` path listed below. Do not substitute a same-named Skill from `~/.claude`, `~/.codex`, or another compatibility directory:
+   - Requirements analysis: `{{skills_root}}/analyze/SKILL.md`
+   - Solution design: `{{skills_root}}/design/SKILL.md`
+   - Development: `{{skills_root}}/develop/SKILL.md`
+   - Knowledge base: `{{skills_root}}/kb/SKILL.md`
+   - Templates: `{{skills_root}}/templates/SKILL.md`
+
+## Analysis gate and managed entry
+
+- `analyze` must read `analyze/SKILL.md` and call its existing `scripts/score_requirement.py` for the deterministic scoring gate. If completeness is below `workflow.require_score` (7 by default), ask questions before materializing a plan. Treat `auto_decide` as `false` when neither project nor global configuration sets it explicitly.
+- When clarification is needed and the question fits a finite set of options, prefer Cursor's built-in AskQuestion (`ask_question`) when the current conversation exposes it. It is not an MCP tool; do not use `GetMcpTools` to decide that it is unavailable. Use the questionnaire's free-form input instead of adding a synthetic “Other” option; if the current conversation does not expose the tool or the call fails, fall back to a short text question. Ask open-ended factual questions in text. Until the questionnaire is answered, do not enter Design/Develop or write plan, state, handoff, or receipts.
+- Only `new_plan`, `continue_plan`, `finalize`, or an explicitly managed develop request enters the four-step read chain:
+  `state/active_plan.json` → `plan/<id>/plan.md` → `state/current_handoff.json` → `plan/<id>/receipts/`.
+- Machine truth may be written only through the installed payload's `sopify_writer` library API. Do not invent `python3 -m sopify_writer`; do not edit state, handoff, or receipts directly.
+
+## Support boundary and output
+
+- Cursor remains `BASELINE_SUPPORTED`: file presence or a single model claim is not protocol-level verification; support conclusions require observable host evidence.
+- Agent CLI users may invoke the installed Skills manually; user Hooks remain available where Cursor loads them. Sopify does not claim automatic CLI routing through this Plugin Rule.
+- Follow the already-read `{{skills_root}}/references/shared-writing-dna.md`. After entering a phase Skill, read `{{skills_root}}/references/output-contract.md`. For consult, give only the conclusion and necessary evidence; do not add a banner, `Changes`, or `Next` to fill a template.
+- Do not modify Cursor settings, proxy, model, account, API key, keychain, or MCP. Cloud Agents are out of scope.

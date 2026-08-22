@@ -529,6 +529,12 @@ def _build_next_step(target: InstallTarget, workspace_root: Path | None) -> str:
         if workspace_root is None:
             return f"Open {target.host.title()} in your project workspace to start using Sopify."
         return f"Open {target.host.title()} in {workspace_root} to start using Sopify."
+    if adapter.is_user_plugin_scope:
+        return (
+            "Restart Cursor or run Developer: Reload Window, then open a target repository and "
+            "verify the Sopify user Plugin is enabled. "
+            "The installer does not modify project files."
+        )
     if workspace_root is None:
         return (
             f"Open {target.host} in any project workspace and trigger Sopify. "
@@ -561,7 +567,19 @@ def _render_distribution_user_result_en(report: DistributionInstallReport) -> st
         "",
         "Project:",
     ]
-    if install_result.workspace_root is None:
+    if _is_user_plugin_install(install_result):
+        lines.extend(
+            [
+                f"  User Plugin rule: {_user_plugin_rule_path(install_result)}",
+                "  No project directory or .sopify state was changed.",
+                "",
+                "Next:",
+                "  1. Restart Cursor or run `Developer: Reload Window`.",
+                f"  2. Open {host_name} in a target repository.",
+                "  3. Confirm the Sopify Plugin and its Always Rule in Cursor Settings before relying on host behavior.",
+            ]
+        )
+    elif install_result.workspace_root is None:
         lines.extend(
             [
                 "  No project directory was changed.",
@@ -618,7 +636,19 @@ def _render_distribution_user_result_zh(report: DistributionInstallReport) -> st
         "",
         "项目：",
     ]
-    if install_result.workspace_root is None:
+    if _is_user_plugin_install(install_result):
+        lines.extend(
+            [
+                f"  用户 Plugin 规则：{_user_plugin_rule_path(install_result)}",
+                "  未修改任何项目目录，也未初始化 .sopify 状态。",
+                "",
+                "下一步：",
+                "  1. 重启 Cursor，或执行 `Developer: Reload Window`。",
+                f"  2. 在目标仓库中打开 {host_name}。",
+                "  3. 使用前请在 Cursor Settings 中确认 Sopify Plugin 及其 Always Rule 已启用。",
+            ]
+        )
+    elif install_result.workspace_root is None:
         lines.extend(
             [
                 "  这次没有修改任何项目目录。",
@@ -767,9 +797,25 @@ def _select_host_checks(payload: dict[str, object], target: InstallTarget) -> tu
 
 
 def _render_workspace_line(install_result: InstallResult) -> str:
+    if _is_user_plugin_install(install_result):
+        return f"project unchanged; user Plugin rule installed at {_user_plugin_rule_path(install_result)}"
     if install_result.workspace_root is None:
         return "will bootstrap on first project trigger"
     return f"pre-warmed at {install_result.workspace_root}"
+
+
+def _is_user_plugin_install(install_result: InstallResult) -> bool:
+    try:
+        return get_host_adapter(install_result.target.host).is_user_plugin_scope
+    except ValueError:
+        return False
+
+
+def _user_plugin_rule_path(install_result: InstallResult) -> Path:
+    for path in install_result.host_install.paths:
+        if path.suffix == ".mdc":
+            return path
+    raise ValueError("User Plugin installation did not report its rule path")
 
 
 def _workspace_bootstrap_action(install_result: InstallResult) -> str:

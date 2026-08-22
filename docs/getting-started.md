@@ -15,7 +15,7 @@ Sopify adds resumable, traceable AI workflows to any project. After setup:
 
 - Git repository (local or remote)
 - Python 3.11+
-- An AI host: Codex, Claude, Qoder, or Copilot
+- An AI host: Codex, Claude, Qoder, Copilot, or Cursor
 
 ## Quick Setup (One Command)
 
@@ -139,9 +139,44 @@ Copilot reads project-level instruction files across its supported surfaces
 Full trigger wiring (equivalent to Codex/Claude `~go`) is coming in a future
 release.
 
+### Cursor IDE (optional Agent CLI)
+
+Cursor IDE uses one user-level Plugin rule. The same installation provides a
+global Skill/payload tree under `~/.cursor/` and user-level hooks in
+`~/.cursor/hooks.json`:
+
+```bash
+curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:en-US
+```
+
+After the first install or any local Plugin update, restart Cursor or run
+`Developer: Reload Window` before checking the Plugin and its Rule.
+
+`--workspace` is not required and no project Rule or `.sopify` state is
+created during install. `--with-evidentloop` is not supported for Cursor in
+this release. The Plugin Rule uses valid `.mdc` frontmatter with
+`alwaysApply: true` and routes to `~/.cursor/skills/sopify`.
+
+The tested Agent CLI does not automatically load this user Plugin Rule.
+Automatic entry for Agent CLI and Cloud Agent is outside this release. No
+launcher, project Rule, prompt injector, or runtime is added. See
+[Cursor host acceptance](./cursor-host.md). The current tier remains
+`BASELINE_SUPPORTED`.
+
 ## Verify Setup
 
-After bootstrap, check the workspace marker:
+Cursor installs at user scope and intentionally does not create a workspace
+marker. From the Sopify checkout, verify its install surface with:
+
+```bash
+python3 scripts/sopify_doctor.py --format json --home-root "$HOME"
+```
+
+After reloading Cursor, also confirm that the user-scope Sopify Plugin rule
+appears under Customize > Rules with mode Always. These checks prove
+installation and Plugin rule registration, not model behavior.
+
+For a separately bootstrapped workspace, check its marker with:
 
 ```bash
 cat .sopify/sopify.json

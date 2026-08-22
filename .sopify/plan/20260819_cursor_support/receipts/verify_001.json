@@ -1,0 +1,38 @@
+{
+  "evidence": {
+    "black_box": {
+      "cursor_cli_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "cursor_ide_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "open_workspace_has_project_rule": false,
+      "real_home_has_sopify_cursor_assets": false,
+      "reason_code": "human_action_required"
+    },
+    "command": "python3 -m pytest tests",
+    "committed": false,
+    "pushed": false,
+    "pytest": {
+      "passed": 293,
+      "subtests": 73
+    },
+    "reason_code": null,
+    "result": "passed",
+    "retry_count": 0,
+    "review_result": {
+      "code_quality": "pass_with_known_fail_open_limits",
+      "spec_compliance": "pass_with_residual_black_box"
+    },
+    "root_cause": null,
+    "scope": "tasks 3.1-3.4, 4.2; installer/cursor_hook.py, installer/cursor_hooks.py, installer/inspection.py, installer/payload.py, installer/hosts/cursor.py, tests/test_cursor_hooks.py",
+    "support_tier": "baseline_supported",
+    "verification_source": "project_native"
+  },
+  "provenance": {
+    "host": "cursor",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:5f1d69c2e7a3887d62947f95f308d0f8db961c159dacfa09cd5fc0620f71f1da",
+    "receipt_id": "verify_001",
+    "source": "implementation_verify"
+  },
+  "timestamp": "2026-08-19T06:37:45+00:00",
+  "verdict": "implementation_complete_black_box_pending"
+}

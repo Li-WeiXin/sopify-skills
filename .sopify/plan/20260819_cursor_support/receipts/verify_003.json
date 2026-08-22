@@ -1,0 +1,50 @@
+{
+  "evidence": {
+    "command": "python3 -m pytest tests -q",
+    "committed": false,
+    "compileall": "passed",
+    "cursor_cli": {
+      "analyze_score_gate": "not_executed",
+      "command": "echo hacked>.sopify/plan/blackbox_plan/receipts/exec_001.json",
+      "consult_semantic_routing": "not_clean",
+      "persistent_transcript_contains_tool_result": false,
+      "receipt_redirect_session": "3a13cbf2-d184-488e-9331-25e7a7510365",
+      "receipt_sha256_unchanged": "00c09422e88cc03dbeee39c2a267884a2bf9f46f9594a5a6d63352debe5a7970",
+      "status": "partial",
+      "stream_json_tool_result": "completed_rejected_by_hook"
+    },
+    "cursor_ide": {
+      "status": "BLACK_BOX_NOT_VERIFIED"
+    },
+    "diff_check": "passed",
+    "fix": "add > to the existing receipt command prefix boundary; no shell parser or new abstraction",
+    "machine_truth_hashes_unchanged": true,
+    "pushed": false,
+    "pytest": {
+      "passed": 307,
+      "subtests_passed": 76
+    },
+    "reason_code": null,
+    "result": "passed",
+    "retry_count": 0,
+    "review_result": {
+      "code_quality": "minimal_boundary_change",
+      "independent_review_before_fix": "no_p0_p1_one_open_p2",
+      "spec_compliance": "receipt_p2_fixed_with_declared_behavior_gaps"
+    },
+    "root_cause": "RECEIPT_COMMAND_RE did not accept output redirection as a path boundary",
+    "scope": "receipt path immediately following shell output redirection",
+    "settings_sha256_unchanged": "9312893735cb53aa1a8acece3f9adde34dcc8128e3d03c1a72f7ec423344f1e5",
+    "support_tier": "baseline_supported",
+    "verification_source": "project_native_and_cursor_cli_stream_json"
+  },
+  "provenance": {
+    "host": "cursor",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:5980ff839636ac70ef10d0fe01ffc565b709ac6f6de315ef3c0c327363b1bfa1",
+    "receipt_id": "verify_003",
+    "source": "implementation_verify_after_independent_review"
+  },
+  "timestamp": "2026-08-19T08:26:34+00:00",
+  "verdict": "receipt_redirect_fixed_cli_rejected_remaining_black_box_gaps"
+}

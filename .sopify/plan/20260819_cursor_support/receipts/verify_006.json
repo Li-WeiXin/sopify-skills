@@ -1,0 +1,30 @@
+{
+  "evidence": {
+    "behavior_boundary": "IDE and CLI behavior checks remain separate from file installation checks",
+    "committed": false,
+    "full_tests": "309 passed, 78 subtests passed",
+    "git_diff_check": "passed",
+    "isolated_cursor_install": "Plugin, Rule, Skills, payload and Hooks passed Doctor",
+    "merged": false,
+    "pushed": false,
+    "python_syntax": "54 files parsed",
+    "release_sync_replay": "four source templates updated to one version",
+    "released": false,
+    "scope": "Cursor release version sync and public installation text",
+    "shell_syntax": "passed",
+    "support_tier": "BASELINE_SUPPORTED",
+    "svg_xml": "passed",
+    "targeted_tests": "33 passed",
+    "version_consistency": "passed"
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:1e7865f1abbe2479326ccbd15de8741058050dd4e232ea700ad2c39939e93701",
+    "receipt_id": "verify_006",
+    "reviewer": "codex_release_preflight",
+    "source": "final_worktree_commands_and_file_review"
+  },
+  "timestamp": "2026-08-22T05:37:02+00:00",
+  "verdict": "release_preflight_passed"
+}

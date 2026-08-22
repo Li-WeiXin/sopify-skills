@@ -30,24 +30,28 @@
   <text x="76" y="76" class="tier-label" fill="#6b7280">HOST LAYER</text>
   <text x="200" y="76" class="node-desc">Host LLM executes code; Sopify preserves the process as files</text>
 
-  <rect x="200" y="84" width="100" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-  <circle cx="213" cy="97" r="3" fill="#10b981"/>
-  <text x="255" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Codex</text>
+  <rect x="190" y="84" width="92" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <circle cx="203" cy="97" r="3" fill="#10b981"/>
+  <text x="236" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Codex</text>
 
-  <rect x="320" y="84" width="100" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-  <circle cx="333" cy="97" r="3" fill="#10b981"/>
-  <text x="375" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Claude</text>
+  <rect x="292" y="84" width="92" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <circle cx="305" cy="97" r="3" fill="#10b981"/>
+  <text x="338" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Claude</text>
 
-  <rect x="440" y="84" width="100" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-  <circle cx="453" cy="97" r="3" fill="#10b981"/>
-  <text x="495" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Qoder</text>
+  <rect x="394" y="84" width="92" height="26" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <circle cx="407" cy="97" r="3" fill="#10b981"/>
+  <text x="440" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Qoder</text>
 
-  <rect x="560" y="84" width="100" height="26" rx="6" fill="#fff7ed" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
-  <circle cx="573" cy="97" r="3" fill="#fbbf24"/>
-  <text x="615" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Copilot</text>
+  <rect x="496" y="84" width="92" height="26" rx="6" fill="#fff7ed" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
+  <circle cx="509" cy="97" r="3" fill="#fbbf24"/>
+  <text x="542" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Copilot</text>
 
-  <rect x="680" y="84" width="110" height="26" rx="6" fill="#f9fafb" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2"/>
-  <text x="735" y="101" text-anchor="middle" class="node-desc">Other adapters</text>
+  <rect x="598" y="84" width="92" height="26" rx="6" fill="#fff7ed" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2"/>
+  <circle cx="611" cy="97" r="3" fill="#fbbf24"/>
+  <text x="644" y="101" text-anchor="middle" class="node-name" style="font-size:11px">Cursor</text>
+
+  <rect x="700" y="84" width="110" height="26" rx="6" fill="#f9fafb" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="755" y="101" text-anchor="middle" class="node-desc">Other adapters</text>
 
   <!-- Arrow Tier 1 → 2 -->
   <line x1="480" y1="120" x2="480" y2="136" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a-gray)"/>
@@ -163,5 +167,5 @@
 
   <text x="478" y="561" class="node-desc" style="font-style:italic">Convention mode only — host self-drives, writer validates</text>
 
-  <text x="480" y="588" text-anchor="end" class="node-desc" fill="#9ca3af">Sopify · 2026-06</text>
+  <text x="480" y="588" text-anchor="end" class="node-desc" fill="#9ca3af">Sopify · 2026-08</text>
 </svg>

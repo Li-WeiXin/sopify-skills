@@ -40,9 +40,9 @@
     <text x="84" y="144" class="stage-num" font-family="-apple-system,'Helvetica Neue',sans-serif">I</text>
     <text x="102" y="144" class="lbl" font-family="-apple-system,'Helvetica Neue',sans-serif">HOST</text>
     <text x="84" y="170" class="stage-title" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">用户在受支持宿主提需求</text>
-    <text x="84" y="186" class="stage-sub" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">同一协议，四个入口</text>
+    <text x="84" y="186" class="stage-sub" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">同一协议，五个宿主适配</text>
 
-    <!-- 4 host cards, ALL 86px wide. L-col right=170, R-col right=262. Stage right=274. -->
+    <!-- 5 host cards, ALL 86px wide. L-col right=170, R-col right=262. Stage right=274. -->
     <g transform="translate(84,206)" filter="url(#shadowSoft)">
       <rect width="86" height="44" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1.3"/>
       <circle cx="14" cy="22" r="3.5" fill="#10b981"/>
@@ -68,12 +68,19 @@
       <text x="24" y="34" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">verified</text>
     </g>
 
-    <text x="84" y="336" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">同一 .sopify/ 项目</text>
-    <text x="84" y="352" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">受支持宿主加载同一套规则</text>
-    <text x="84" y="368" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">项目记录保持一致</text>
+    <g transform="translate(129,314)" filter="url(#shadowSoft)">
+      <rect width="86" height="44" rx="6" fill="#fff7ed" stroke="#fbbf24" stroke-width="1.3" stroke-dasharray="3,2"/>
+      <circle cx="14" cy="22" r="3.5" fill="#fbbf24"/>
+      <text x="24" y="20" class="nm" font-family="-apple-system,'Helvetica Neue',sans-serif">Cursor</text>
+      <text x="24" y="34" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">baseline</text>
+    </g>
 
-    <text x="84" y="438" class="fn" font-family="'Cascadia Code','SF Mono','Courier New',monospace">~go</text>
-    <text x="110" y="438" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif"> · 用户发出请求</text>
+    <text x="84" y="374" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">同一 .sopify/ 项目</text>
+    <text x="84" y="390" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">受支持宿主消费同一协议</text>
+    <text x="84" y="406" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">项目记录保持一致</text>
+
+    <text x="84" y="438" class="fn" font-family="'Cascadia Code','SF Mono','Courier New',monospace">request</text>
+    <text x="126" y="438" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif"> · 用户发出请求</text>
   </g>
 
   <!-- Arrow 1 → 2 (gap 274→334, center x=304) -->
@@ -241,5 +248,5 @@
     <text x="700" y="2" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">baseline supported</text>
   </g>
 
-  <text x="1330" y="622" text-anchor="end" class="foot" font-family="-apple-system,'Helvetica Neue',sans-serif">Sopify · 2026-06</text>
+  <text x="1330" y="622" text-anchor="end" class="foot" font-family="-apple-system,'Helvetica Neue',sans-serif">Sopify · 2026-08</text>
 </svg>

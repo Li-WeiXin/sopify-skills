@@ -31,6 +31,7 @@ from installer.hosts.base import HostAdapter
 from installer.hosts.claude import CLAUDE_ADAPTER
 from installer.hosts.codex import CODEX_ADAPTER
 from installer.hosts.copilot import COPILOT_ADAPTER
+from installer.hosts.cursor import CURSOR_ADAPTER
 from installer.hosts.qoder import QODER_ADAPTER
 from installer.models import EvidentLoopInstallResult, InstallError
 from scripts.install_sopify import build_parser, run_install
@@ -88,6 +89,7 @@ class EvidentLoopInstallerTests(unittest.TestCase):
                     ),
                     path,
                 )
+        self.assertIsNone(CURSOR_ADAPTER.skills_cli_agent)
 
     def test_flag_is_disabled_by_default_and_does_no_companion_work(self) -> None:
         parser = build_parser()
@@ -117,6 +119,17 @@ class EvidentLoopInstallerTests(unittest.TestCase):
         prepare.assert_not_called()
         install.assert_not_called()
         self.assertIsNone(result.evidentloop_install)
+
+    def test_cursor_rejects_explicit_evidentloop_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
+            with self.assertRaisesRegex(InstallError, "does not support --with-evidentloop"):
+                run_install(
+                    target_value="cursor",
+                    workspace_value=workspace_dir,
+                    repo_root=REPO_ROOT,
+                    home_root=Path(home_dir),
+                    with_evidentloop=True,
+                )
 
     def test_missing_mapping_stops_before_command_lookup(self) -> None:
         adapter = HostAdapter(

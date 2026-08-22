@@ -1,0 +1,21 @@
+{
+  "evidence": {
+    "decision": "authorized",
+    "finalize_authorized": false,
+    "operations": [
+      "commit feat/cursor-support locally",
+      "switch /Users/weixin.li/code/github/sopify to feat/cursor-support",
+      "remove /Users/weixin.li/.codex/worktrees/f74d/sopify"
+    ],
+    "push_authorized": false
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:d45f120c339224588ce6562b9d96f183ac6f4f7bf0969d3507b65a0f5e9b7ffe",
+    "receipt_id": "exec_002",
+    "source": "user_decision"
+  },
+  "timestamp": "2026-08-19T08:30:57+00:00",
+  "verdict": "local_commit_switch_and_worktree_removal_authorized_no_push"
+}

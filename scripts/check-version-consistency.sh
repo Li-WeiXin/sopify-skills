@@ -8,6 +8,8 @@ README_ZH="$ROOT_DIR/README.zh-CN.md"
 CHANGELOG="$ROOT_DIR/CHANGELOG.md"
 SKILLS_ZH="$ROOT_DIR/skills/zh/header.md.template"
 SKILLS_EN="$ROOT_DIR/skills/en/header.md.template"
+CURSOR_RULE_ZH="$ROOT_DIR/skills/zh/cursor-plugin-rule.mdc.template"
+CURSOR_RULE_EN="$ROOT_DIR/skills/en/cursor-plugin-rule.mdc.template"
 
 usage() {
   cat <<'EOF'
@@ -16,7 +18,7 @@ Usage: scripts/check-version-consistency.sh
 Validate version consistency across:
   - README.md / README.zh-CN.md version badges
   - Latest released version in CHANGELOG.md
-  - SOPIFY_VERSION headers in skills/ source templates
+  - SOPIFY_VERSION in the standard and Cursor Rule templates
 
 Exit codes:
   0: all checks passed
@@ -35,6 +37,8 @@ required_files=(
   "$CHANGELOG"
   "$SKILLS_ZH"
   "$SKILLS_EN"
+  "$CURSOR_RULE_ZH"
+  "$CURSOR_RULE_EN"
 )
 
 for file in "${required_files[@]}"; do
@@ -125,6 +129,8 @@ fi
 
 skills_zh_version="$(extract_sopify_version "$SKILLS_ZH")"
 skills_en_version="$(extract_sopify_version "$SKILLS_EN")"
+cursor_zh_version="$(extract_sopify_version "$CURSOR_RULE_ZH")"
+cursor_en_version="$(extract_sopify_version "$CURSOR_RULE_EN")"
 
 if [[ -z "$skills_zh_version" ]]; then
   add_error "skills/zh/header.md.template: missing SOPIFY_VERSION header."
@@ -132,11 +138,17 @@ fi
 if [[ -z "$skills_en_version" ]]; then
   add_error "skills/en/header.md.template: missing SOPIFY_VERSION header."
 fi
-header_versions=("$skills_zh_version" "$skills_en_version")
-first_header_version="${header_versions[0]}"
-for version in "${header_versions[@]}"; do
+if [[ -z "$cursor_zh_version" ]]; then
+  add_error "skills/zh/cursor-plugin-rule.mdc.template: missing SOPIFY_VERSION header."
+fi
+if [[ -z "$cursor_en_version" ]]; then
+  add_error "skills/en/cursor-plugin-rule.mdc.template: missing SOPIFY_VERSION header."
+fi
+source_versions=("$skills_zh_version" "$skills_en_version" "$cursor_zh_version" "$cursor_en_version")
+first_header_version="${source_versions[0]}"
+for version in "${source_versions[@]}"; do
   if [[ -n "$version" && "$version" != "$first_header_version" ]]; then
-    add_error "Header SOPIFY_VERSION mismatch: skills=$skills_zh_version/$skills_en_version."
+    add_error "Source SOPIFY_VERSION mismatch: generic=$skills_zh_version/$skills_en_version, cursor=$cursor_zh_version/$cursor_en_version."
     break
   fi
 done

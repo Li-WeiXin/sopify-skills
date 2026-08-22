@@ -18,4 +18,5 @@ host_support:
   - claude
   - qoder
   - copilot
+  - cursor
 permission_mode: default

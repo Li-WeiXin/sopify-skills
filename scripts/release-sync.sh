@@ -8,6 +8,8 @@ README_ZH="$ROOT_DIR/README.zh-CN.md"
 CHANGELOG="$ROOT_DIR/CHANGELOG.md"
 SKILLS_ZH="$ROOT_DIR/skills/zh/header.md.template"
 SKILLS_EN="$ROOT_DIR/skills/en/header.md.template"
+CURSOR_RULE_ZH="$ROOT_DIR/skills/zh/cursor-plugin-rule.mdc.template"
+CURSOR_RULE_EN="$ROOT_DIR/skills/en/cursor-plugin-rule.mdc.template"
 CHANGELOG_DRAFT_SCRIPT="$ROOT_DIR/scripts/release-draft-changelog.py"
 
 usage() {
@@ -19,7 +21,7 @@ Synchronize release version across key files:
   2) CHANGELOG.md:
      - move current [Unreleased] content into
        ## [<version>] - <date>
-  3) skills/ source template SOPIFY_VERSION headers (zh/en)
+  3) SOPIFY_VERSION in the standard and Cursor Rule templates (zh/en)
   4) Run consistency checks
 
 Arguments:
@@ -71,6 +73,8 @@ required_files=(
   "$CHANGELOG"
   "$SKILLS_ZH"
   "$SKILLS_EN"
+  "$CURSOR_RULE_ZH"
+  "$CURSOR_RULE_EN"
   "$CHANGELOG_DRAFT_SCRIPT"
   "$ROOT_DIR/scripts/check-version-consistency.sh"
 )
@@ -279,6 +283,8 @@ require_single_match "$README_PRIMARY" 'img\.shields\.io/badge/version-.*-orange
 require_single_match "$README_ZH" 'img\.shields\.io/badge/version-.*-orange\.svg' "README zh-CN version badge"
 require_single_match "$SKILLS_ZH" '^<!-- SOPIFY_VERSION: .* -->$' "skills/zh SOPIFY_VERSION"
 require_single_match "$SKILLS_EN" '^<!-- SOPIFY_VERSION: .* -->$' "skills/en SOPIFY_VERSION"
+require_single_match "$CURSOR_RULE_ZH" '^<!-- SOPIFY_VERSION: .* -->$' "skills/zh Cursor SOPIFY_VERSION"
+require_single_match "$CURSOR_RULE_EN" '^<!-- SOPIFY_VERSION: .* -->$' "skills/en Cursor SOPIFY_VERSION"
 
 if grep -Fq "## [$VERSION] - " "$CHANGELOG"; then
   echo "CHANGELOG already contains version $VERSION." >&2
@@ -294,6 +300,8 @@ promote_unreleased_to_release "$CHANGELOG"
 
 replace_once "$SKILLS_ZH" '^<!-- SOPIFY_VERSION: .* -->$' "<!-- SOPIFY_VERSION: $VERSION -->"
 replace_once "$SKILLS_EN" '^<!-- SOPIFY_VERSION: .* -->$' "<!-- SOPIFY_VERSION: $VERSION -->"
+replace_once "$CURSOR_RULE_ZH" '^<!-- SOPIFY_VERSION: .* -->$' "<!-- SOPIFY_VERSION: $VERSION -->"
+replace_once "$CURSOR_RULE_EN" '^<!-- SOPIFY_VERSION: .* -->$' "<!-- SOPIFY_VERSION: $VERSION -->"
 
 bash "$ROOT_DIR/scripts/check-version-consistency.sh"
 

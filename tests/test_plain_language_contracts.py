@@ -200,6 +200,29 @@ def test_static_pages_keep_release_metadata(
 
 
 @pytest.mark.parametrize(
+    "page,host_label,install_copy",
+    [
+        (
+            "index.html",
+            "Cursor · baseline",
+            "Codex, Claude, Qoder, Copilot, and Cursor targets",
+        ),
+        (
+            "zh-CN.html",
+            "Cursor · 基线支持",
+            "支持 Codex、Claude、Qoder、Copilot 与 Cursor",
+        ),
+    ],
+)
+def test_static_pages_include_cursor_host(
+    page: str, host_label: str, install_copy: str
+) -> None:
+    html = (REPO_ROOT / page).read_text(encoding="utf-8")
+    assert host_label in html
+    assert install_copy in html
+
+
+@pytest.mark.parametrize(
     "page,readme,asset,label,required",
     [
         (

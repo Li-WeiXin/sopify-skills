@@ -1,0 +1,81 @@
+{
+  "evidence": {
+    "automated_verification": {
+      "bash_n_install_sh": "passed",
+      "git_diff_check": "passed",
+      "pytest": {
+        "passed": 308,
+        "subtests_passed": 78
+      },
+      "python_compileall": "passed",
+      "svg_visual_render": "passed",
+      "svg_xml": "passed"
+    },
+    "committed": false,
+    "cursor_cli": {
+      "automatic_plugin_rule": "unsupported",
+      "manual_skill_path": "documented_compatibility_surface"
+    },
+    "cursor_ide": {
+      "analyze_score_gate": "score_script_executed",
+      "askquestion": "capability_path_observed_with_text_fallback",
+      "consult_readonly": "observable_read_only_tool_trace",
+      "hook_direct_write": "denied_with_hash_unchanged",
+      "managed_chain": "analyze_design_stop_then_develop_observed",
+      "rule_registration": "always_apply_observed",
+      "writer_boundary": "state_handoff_receipts_written_via_library_api"
+    },
+    "doctor": {
+      "cli_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "ide_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "install_surface": "passed"
+    },
+    "finalized": false,
+    "implementation": {
+      "extra_runtime_or_launcher": false,
+      "hooks": "user_level_fail_open_guard",
+      "ide_entry": "user_plugin_always_rule",
+      "payload": "user_level_versioned_bundle",
+      "project_rule": "removed",
+      "skills": "global_five_skill_tree"
+    },
+    "independent_reviews": {
+      "cursor_implementation": {
+        "p0": 0,
+        "p1": 0,
+        "verdict": "accept"
+      },
+      "visual_and_docs": {
+        "p0": 0,
+        "p1": 0,
+        "p2": 0,
+        "verdict": "accept"
+      }
+    },
+    "pushed": false,
+    "real_install": {
+      "candidate_assets_exact_match": true,
+      "protected_cursor_configuration_unchanged": true,
+      "system_proxy_unchanged": true
+    },
+    "released": false,
+    "result": "passed",
+    "support_tier": "BASELINE_SUPPORTED",
+    "unverified_boundaries": [
+      "independent_sessionStart_black_box",
+      "explicit_finalize_black_box",
+      "AskQuestion_cross_model_stability",
+      "Cloud_Agent"
+    ]
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:09e5ddd1ef473a0d410f65c882bdc56ccf0aebc3f85c038479c402293699e4dd",
+    "receipt_id": "verify_004",
+    "reviewer": "cursor",
+    "source": "final_closeout_after_cursor_and_visual_independent_reviews"
+  },
+  "timestamp": "2026-08-22T02:46:58+00:00",
+  "verdict": "cursor_baseline_supported_release_candidate_verified"
+}

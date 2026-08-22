@@ -12,7 +12,7 @@ from scripts._yaml_subset import load_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILTIN_SKILL_IDS = ("analyze", "design", "develop", "kb", "templates")
-SUPPORTED_HOSTS = ["codex", "claude", "qoder", "copilot"]
+SUPPORTED_HOSTS = ["codex", "claude", "qoder", "copilot", "cursor"]
 
 
 class PlanContractAssetTests(unittest.TestCase):
@@ -117,6 +117,57 @@ class PlanContractAssetTests(unittest.TestCase):
                     self.assertIn("plan_version", rendered)
                     self.assertIn("architecture", rendered)
                     self.assertNotIn("light/standard/full", rendered)
+
+    def test_cursor_plugin_rule_uses_legal_frontmatter_and_thin_routing_contract(self) -> None:
+        render_script = REPO_ROOT / "scripts" / "render-host-skills.py"
+        for language in ("en", "zh"):
+            with self.subTest(language=language), tempfile.TemporaryDirectory() as temp_dir:
+                output = Path(temp_dir) / "sopify.mdc"
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(render_script),
+                        "--hosts-file",
+                        str(REPO_ROOT / "skills" / "hosts.yaml"),
+                        "--skills-root",
+                        str(REPO_ROOT / "skills"),
+                        "--lang",
+                        language,
+                        "--host",
+                        "cursor",
+                        "--output",
+                        str(output),
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                rendered = output.read_text(encoding="utf-8")
+                self.assertTrue(rendered.startswith("---\n"))
+                self.assertIn("alwaysApply: true", rendered)
+                self.assertIn("~/.cursor/skills/sopify/references/shared-writing-dna.md", rendered)
+                self.assertIn("scripts/score_requirement.py", rendered)
+                self.assertIn("auto_decide", rendered)
+                self.assertIn("AskQuestion", rendered)
+                self.assertIn("ask_question", rendered)
+                self.assertIn("GetMcpTools", rendered)
+                self.assertIn("Design/Develop", rendered)
+                self.assertIn(
+                    "free-form input" if language == "en" else "自由输入", rendered
+                )
+                self.assertNotRegex(rendered, r"(?m)^/.+/.cursor/skills/sopify")
+                self.assertIn("analyze/SKILL.md", rendered)
+                self.assertIn("consult_readonly", rendered)
+                self.assertIn("IDE Entry" if language == "en" else "IDE 入口", rendered)
+                self.assertIn(
+                    "does not automatically load" if language == "en" else "不会自动加载",
+                    rendered,
+                )
+                self.assertIn("~/.claude", rendered)
+                self.assertIn("~/.codex", rendered)
+                self.assertIn("state/active_plan.json", rendered)
+                self.assertIn("sopify_writer", rendered)
+                self.assertNotIn("{{skills_root}}", rendered)
 
     def test_develop_completion_requires_explicit_finalize(self) -> None:
         retired_phrases = {

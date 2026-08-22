@@ -106,6 +106,8 @@ def render_header(template_path: Path, host_vars: dict) -> str:
         content = content.replace("{{config_dir}}", config_dir)
     else:
         content = content.replace("{{config_dir}}", "")
+    skills_root = f"{config_dir}/skills/sopify" if config_dir else ""
+    content = content.replace("{{skills_root}}", skills_root)
     # Warn on unresolved variables
     unresolved = re.findall(r"\{\{(\w+)\}\}", content)
     if unresolved:
@@ -146,7 +148,7 @@ def main() -> None:
     if args.verify_all:
         for host_id, host_vars in sorted(hosts.items()):
             for lang in ("en", "zh"):
-                template_path = args.skills_root / lang / "header.md.template"
+                template_path = _template_path(args.skills_root, lang, host_vars)
                 if not template_path.exists():
                     print(f"  SKIP {host_id}:{lang} — template not found")
                     continue
@@ -161,7 +163,7 @@ def main() -> None:
     if args.host not in hosts:
         parser.error(f"Unknown host: {args.host}. Available: {list(hosts.keys())}")
 
-    template_path = args.skills_root / args.lang / "header.md.template"
+    template_path = _template_path(args.skills_root, args.lang, hosts[args.host])
     if not template_path.exists():
         parser.error(f"Template not found: {template_path}")
 
@@ -173,6 +175,11 @@ def main() -> None:
         print(f"Rendered {args.host}:{args.lang} → {args.output}")
     else:
         sys.stdout.write(rendered)
+
+
+def _template_path(skills_root: Path, language: str, host_vars: dict[str, object]) -> Path:
+    relpath = str(host_vars.get("instruction_source_relpath") or "header.md.template")
+    return skills_root / language / relpath
 
 
 if __name__ == "__main__":

@@ -24,6 +24,14 @@ hosts:
     destination_dir: ".github"
     instruction_surface: copilot_instructions_md
     install_enabled: true
+  cursor:
+    host_id: cursor
+    config_dir: "~/.cursor"
+    header_filename: sopify.mdc
+    destination_dir: ".cursor"
+    instruction_surface: user_plugin
+    instruction_source_relpath: cursor-plugin-rule.mdc.template
+    install_enabled: true
   qoder:
     host_id: qoder
     config_dir: "~/.qoder"

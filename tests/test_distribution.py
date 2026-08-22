@@ -213,6 +213,53 @@ class DistributionFacadeTests(unittest.TestCase):
             self.assertIn("workspace outcome: stub_selected [continue]", rendered)
             self.assertIn("workspace bundle: pass (STUB_SELECTED)", rendered)
 
+    def test_cursor_distribution_reports_user_plugin_without_project_write(self) -> None:
+        with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
+            home_root = Path(home_dir)
+            workspace_root = Path(workspace_dir)
+            request = DistributionRequest(
+                target="cursor:zh-CN",
+                workspace=str(workspace_root),
+                ref_override=None,
+                interactive=False,
+                source_channel="repo-local",
+                source_metadata=DistributionSourceMetadata(
+                    resolved_ref="working-tree",
+                    asset_name="scripts/install_sopify.py",
+                ),
+            )
+
+            report = run_distribution_install(
+                request=request,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+                install_executor=run_install,
+            )
+
+            rendered = render_distribution_user_result(report)
+            rule_path = (
+                home_root.resolve()
+                / ".cursor"
+                / "plugins"
+                / "local"
+                / "sopify"
+                / "rules"
+                / "sopify.mdc"
+            )
+            readme_path = rule_path.parent.parent / "README.md"
+            self.assertIn(f"用户 Plugin 规则：{rule_path}", rendered)
+            self.assertTrue(readme_path.is_file())
+            self.assertIn("自适应工作流层", readme_path.read_text(encoding="utf-8"))
+            self.assertIn("未修改任何项目目录", rendered)
+            self.assertIn("Developer: Reload Window", rendered)
+            self.assertIn("确认 Sopify Plugin 及其 Always Rule 已启用", rendered)
+            self.assertFalse((workspace_root / ".cursor").exists())
+            self.assertFalse((workspace_root / ".sopify").exists())
+            self.assertNotIn("已预热", rendered)
+            verbose = render_distribution_result(report)
+            self.assertIn(f"workspace: project unchanged; user Plugin rule installed at {rule_path}", verbose)
+            self.assertNotIn("workspace: pre-warmed", verbose)
+
     def test_distribution_install_rejects_ambiguous_nested_workspace_prewarm(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as repo_dir:
             home_root = Path(home_dir)

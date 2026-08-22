@@ -18,6 +18,7 @@ _MANAGED_BLOCK_END = "<!-- END SOPIFY MANAGED BLOCK -->"
 
 INSTRUCTION_SURFACE_HEADER_EMBEDDED = "header_embedded"
 INSTRUCTION_SURFACE_SINGLE_FILE = "single_file"
+INSTRUCTION_SURFACE_USER_PLUGIN = "user_plugin"
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,7 @@ class HostAdapter:
     config_dir: str | None = None
     instruction_surface: str = field(default=INSTRUCTION_SURFACE_HEADER_EMBEDDED)
     instruction_file_relpath: str | None = field(default=None)
+    instruction_source_relpath: str | None = field(default=None)
     default_language: str | None = field(default=None)
     skills_cli_agent: str | None = field(default=None)
     skill_install_dirname: str | None = field(default=None)
@@ -38,8 +40,25 @@ class HostAdapter:
     def is_workspace_scope(self) -> bool:
         return self.instruction_surface == INSTRUCTION_SURFACE_SINGLE_FILE
 
+    @property
+    def is_user_plugin_scope(self) -> bool:
+        return self.instruction_surface == INSTRUCTION_SURFACE_USER_PLUGIN
+
+    @property
+    def requires_workspace(self) -> bool:
+        """Whether installation needs a project root for its instruction surface."""
+        return self.is_workspace_scope
+
     def source_root(self, repo_root: Path, language_directory: str) -> Path:
         return repo_root / "skills" / language_to_source_dir(language_directory)
+
+    def instruction_source(self, repo_root: Path, language_directory: str) -> Path:
+        """Return the source asset for this host's instruction surface."""
+        source_root = self.source_root(repo_root, language_directory)
+        if self.instruction_source_relpath is not None:
+            return source_root / self.instruction_source_relpath
+        template = source_root / HEADER_TEMPLATE_NAME
+        return template if template.is_file() else source_root / self.header_filename
 
     def destination_root(self, home_root: Path) -> Path:
         return home_root / self.destination_dirname
@@ -54,6 +73,8 @@ class HostAdapter:
             if self.instruction_file_relpath is not None:
                 paths.append(home_root / self.instruction_file_relpath)
             return tuple(paths)
+        if self.is_user_plugin_scope:
+            return (*self.user_plugin_paths(home_root), *self.global_skill_paths(home_root))
         return (
             root / self.header_filename,
             root / "skills" / "sopify" / "analyze" / "SKILL.md",
@@ -66,6 +87,31 @@ class HostAdapter:
         if self.instruction_file_relpath is not None:
             paths.append(workspace_root / self.instruction_file_relpath)
         return tuple(paths)
+
+    def global_skill_paths(self, home_root: Path) -> tuple[Path, ...]:
+        skills_root = self.destination_root(home_root) / "skills" / "sopify"
+        return (
+            skills_root / "analyze" / "SKILL.md",
+            skills_root / "design" / "SKILL.md",
+            skills_root / "develop" / "SKILL.md",
+            skills_root / "kb" / "SKILL.md",
+            skills_root / "templates" / "SKILL.md",
+            skills_root / "references" / "shared-writing-dna.md",
+            skills_root / "references" / "output-contract.md",
+            skills_root / "analyze" / "scripts" / "score_requirement.py",
+        )
+
+    def user_plugin_paths(self, home_root: Path) -> tuple[Path, ...]:
+        if self.instruction_file_relpath is None:
+            raise InstallError(f"Host '{self.host_name}' has no user Plugin rule path")
+        rule = home_root / self.instruction_file_relpath
+        plugin_root = rule.parent.parent
+        return (plugin_root / ".cursor-plugin" / "plugin.json", rule)
+
+    def user_plugin_readme_path(self, home_root: Path) -> Path:
+        """Return the user-visible README path for a user Plugin surface."""
+        _, rule = self.user_plugin_paths(home_root)
+        return rule.parent.parent / "README.md"
 
     def expected_payload_paths(self, home_root: Path) -> tuple[Path, ...]:
         payload_root = self.payload_root(home_root)
@@ -135,6 +181,15 @@ def install_host_assets(
             workspace_root=workspace_root,
             language_directory=language_directory,
         )
+    if adapter.is_user_plugin_scope:
+        from installer.cursor_plugin import install_cursor_user_plugin_assets
+
+        return install_cursor_user_plugin_assets(
+            adapter,
+            repo_root=repo_root,
+            home_root=home_root,
+            language_directory=language_directory,
+        )
     return _install_home_host_assets(
         adapter,
         repo_root=repo_root,
@@ -152,9 +207,7 @@ def _install_home_host_assets(
 ) -> InstallPhaseResult:
     """Install header + skills tree to home directory (Claude/Codex path)."""
     source_root = adapter.source_root(repo_root, language_directory)
-    header_template = source_root / HEADER_TEMPLATE_NAME
-    # Fallback to old-style header if template doesn't exist
-    header_source = header_template if header_template.is_file() else source_root / adapter.header_filename
+    header_source = adapter.instruction_source(repo_root, language_directory)
     skills_source = source_root / "skills" / "sopify"
     if not header_source.is_file():
         raise InstallError(f"Missing source header file: {header_source}")
@@ -345,6 +398,17 @@ def _render_header(source: Path, destination: Path, adapter: HostAdapter) -> Non
     else:
         content = content.replace("{{config_dir}}", "")
     destination.write_text(content, encoding="utf-8")
+
+
+def render_user_plugin_rule(source: Path, adapter: HostAdapter) -> str:
+    """Render a Cursor Plugin rule with a portable user-directory Skill path."""
+    content = source.read_text(encoding="utf-8")
+    content = content.replace("{{config_dir}}", adapter.config_dir or "")
+    if adapter.skill_install_dirname is None:
+        raise InstallError(f"Host '{adapter.host_name}' has no global Skill install path")
+    global_skill_root = f"~/{adapter.skill_install_dirname}/sopify"
+    content = content.replace("{{skills_root}}", global_skill_root)
+    return content.rstrip("\n") + "\n"
 
 
 def _write_managed_block(path: Path, content: str) -> bool:

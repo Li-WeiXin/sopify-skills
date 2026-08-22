@@ -22,6 +22,8 @@ snapshot_managed_release_paths() {
     "CHANGELOG.md"
     "skills/zh/header.md.template"
     "skills/en/header.md.template"
+    "skills/zh/cursor-plugin-rule.mdc.template"
+    "skills/en/cursor-plugin-rule.mdc.template"
   )
   local path
   local src
@@ -152,6 +154,8 @@ git -C "$ROOT_DIR" add \
   CHANGELOG.md \
   skills/zh/header.md.template \
   skills/en/header.md.template \
+  skills/zh/cursor-plugin-rule.mdc.template \
+  skills/en/cursor-plugin-rule.mdc.template \
   tests/golden-snapshots.json
 
 cat >"$STATE_FILE" <<EOF
