@@ -1,0 +1,45 @@
+{
+  "evidence": {
+    "command": "python3 -m pytest -p no:cacheprovider tests -q",
+    "committed": false,
+    "finalized": false,
+    "git_diff_check": "passed",
+    "implementation_changed": false,
+    "independent_audit": {
+      "p0": 0,
+      "p1": 0,
+      "p2_resolved": [
+        "AskQuestion persisted evidence separated from manual UI observation",
+        "Plugin Rule separated from native User Rule terminology"
+      ],
+      "sessionStart": "declared_unverified_boundary_no_code_change",
+      "verdict": "accept"
+    },
+    "pushed": false,
+    "pytest": {
+      "passed": 308,
+      "subtests_passed": 78
+    },
+    "reason_code": null,
+    "released": false,
+    "result": "passed",
+    "retry_count": 0,
+    "review_result": {
+      "code_quality": "documentation_only_no_new_entry_or_runtime",
+      "spec_compliance": "evidence claims now match transcript and Cursor Plugin terminology"
+    },
+    "scope": "AskQuestion evidence wording and user-scope Plugin Rule terminology",
+    "support_tier": "BASELINE_SUPPORTED",
+    "verification_source": "project_native"
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:482b990ac2ca05fd7a37092e7d2f5f83957fe09e2bfb670b05fa80966d840671",
+    "receipt_id": "verify_005",
+    "reviewer": "external_cursor",
+    "source": "post_commit_independent_audit_documentation_cleanup"
+  },
+  "timestamp": "2026-08-22T03:41:09+00:00",
+  "verdict": "cursor_release_docs_evidence_terminology_aligned"
+}

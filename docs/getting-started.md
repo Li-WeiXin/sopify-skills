@@ -174,9 +174,9 @@ marker. From the Sopify checkout, verify its install surface with:
 python3 scripts/sopify_doctor.py --format json --home-root "$HOME"
 ```
 
-After reloading Cursor, also confirm that Customize > Rules lists `sopify` as
-Always. These checks prove installation and Rule registration, not model
-behavior.
+After reloading Cursor, also confirm that the user-scope Sopify Plugin rule
+appears under Customize > Rules with mode Always. These checks prove
+installation and Plugin rule registration, not model behavior.
 
 For a separately bootstrapped workspace, check its marker with:
 

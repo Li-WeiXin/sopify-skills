@@ -17,11 +17,11 @@ knowledge_sync:
 # Sopify Cursor 宿主支持
 
 就绪状态: Ready to archive
-依据: User Rule `sopify` 已显示为 Always Apply；consult、Analyze 评分门、AskQuestion tool use 与文本回退、Analyze → Design → Develop、writer 写回及 Hook direct-write deny 均有可观察 IDE 证据。最终独立复审返回 `accept`；未单独验证的 sessionStart、显式 finalize 与 AskQuestion 跨模型稳定性只作为后续边界，不阻塞本次 baseline 收口。
+依据: 用户范围的 Sopify Plugin Rule 已在 Customize > Rules 中显示为 Always Apply；consult、Analyze 评分门、AskQuestion 调用尝试与文本回退、Analyze → Design → Develop、writer 写回及 Hook direct-write deny 均有可观察 IDE 证据。最终独立复审返回 `accept`；未单独验证的 sessionStart、显式 finalize 与 AskQuestion 跨模型稳定性只作为后续边界，不阻塞本次 baseline 收口。
 
 ## Context / Why
 
-当前 `feat/cursor-support` 已将第五个 host 从每仓项目 Rule 修正为 IDE 用户 Plugin、全局五项 Skills/payload 与用户级 Hooks。安装面、Rule 路由、consult、Analyze 评分、AskQuestion 能力路径、managed develop、writer 写回与 Hook direct-write 证据已闭环；最终独立复审已接受候选，支持档位保持 `BASELINE_SUPPORTED`。Doctor 的行为项继续静态报告 `BLACK_BOX_NOT_VERIFIED`，不把本机临时证据写成可移植产品认证。
+当前 `feat/cursor-support` 已将第五个 host 从每仓项目 Rule 修正为 IDE 用户 Plugin、全局五项 Skills/payload 与用户级 Hooks。安装面、Rule 路由、consult、Analyze 评分、AskQuestion 调用与回退路径、managed develop、writer 写回与 Hook direct-write 证据已闭环；最终独立复审已接受候选，支持档位保持 `BASELINE_SUPPORTED`。Doctor 的行为项继续静态报告 `BLACK_BOX_NOT_VERIFIED`，不把本机临时证据写成可移植产品认证。
 
 用户主要在包含多个独立 Git 仓库的工作区中使用 Cursor，希望 Sopify 成为安装一次即可跨仓库工作的默认语义入口，自动区分 consult、quick fix 与 managed workflow，并按当前仓库的 `.sopify/`、项目规则和知识文档进入现有 Skills。每个仓库单独安装项目 `.mdc` 会增加迁移成本，也无法证明模型实际执行协议。
 
@@ -94,11 +94,11 @@ Cursor 官方允许用户范围安装 Cursor Plugin，Plugin 可包含 `rules/*.
 - [x] 根据真实 Customize 空白详情页补充最薄双语 Plugin README；只介绍用途、工作方式与支持边界，不复制 Rule 或协议正文。真实 Reload 证明 Local 详情页不渲染 manifest description 或 README，用户已接受该宿主限制；README 保留为包内/发布文档，但不作为 Doctor 或 installed 健康硬门槛。
 - [-] CLI 自动入口验收已按产品决策关闭：2026-08-20 session `4c24eab4-dd82-46f3-8fd7-67888baa1a53` 反证自动 Plugin 入口未加载；显式 `--plugin-dir` session `7626c137-9668-450f-ab00-a44619f90f9c` 与唯一标记探针 `109d2991-78e6-46d8-a19a-5bd86f3198f0` 同样未加载 Rule。三份 machine truth 哈希均未变化。用户接受 CLI 低频手工 Skill 路径，因此不实施 launcher。
 - [x] 批判核验 Plugin 自动入口失败：包加载成功但 Plugin `ruleCount: 0`；“会遵循 Plugin”的回答前主动 Glob/Read 本地 Rule，不计注入证据。完成单变量 manifest 自动发现修复、22 tests / 2 subtests 定向验证、308 tests / 78 subtests 全量回归、compileall、diff check 与真实重装，受保护配置哈希未变。
-- [x] Reload 后 UI 显示 User Rule `sopify`，真实文件名为 `sopify.mdc`、模式为 Always Apply；Cursor Plugin 服务在 sopify、data-sprite 等窗口均报告 `ruleCount: 1`，目录自动发现修复成立。
+- [x] Reload 后用户范围的 Sopify Plugin Rule 在 Customize > Rules 中显示为 `sopify`、模式为 Always Apply；真实文件名为 `sopify.mdc`，Cursor Plugin 服务在 sopify、data-sprite 等窗口均报告 `ruleCount: 1`，目录自动发现修复成立。
 - [x] IDE consult 会话 `067ce461-c667-46fb-88ce-bffe4c4362a1` 只读取 Cursor shared-writing-dna 并执行只读 Git 查询；分支和 23 个 tracked / 6 个 untracked 变更与现场一致，未加载阶段 Skill、未续跑 active plan、未写 machine truth。
 - [x] IDE Analyze 会话 `7101b90b-ce5d-4acb-8fc3-930056f95e68` 读取 Cursor Analyze Skill、必要规则与输出契约，并实际运行 `score_requirement.py` 得到 `3/10, pass=false`；随后只追问，不进入 Design、不创建 plan/state/receipt。
 - [x] 真实 Cursor 安装原位切换为 `cursor:zh-CN`；Plugin 与 Skill 根各只有一份，英文 `Requirements Analysis` 模板无残留，hooks / CLI config 哈希及系统代理不变，settings 仍不存在。全量回归为 308 passed / 78 subtests，compileall 与 `git diff --check` 通过。
-- [x] 最薄 AskQuestion 扩展仅修改双语 Cursor Plugin Rule 与既有静态契约测试：有限选项按当前会话能力优先使用内建 AskQuestion，不经 MCP 探测，使用问卷自带自由输入并保留文本回退。会话 `84e9fa01-c2dc-4db5-9611-0f15c120bcb8` 同时保留了工具不可用与后续未再报 `Tool not found` 的 AskQuestion tool use，证明能力路径存在但不承诺跨模型稳定或选项回传。
+- [x] 最薄 AskQuestion 扩展仅修改双语 Cursor Plugin Rule 与既有静态契约测试：有限选项按当前会话能力优先使用内建 AskQuestion，不经 MCP 探测，使用问卷自带自由输入并保留文本回退。会话 `84e9fa01-c2dc-4db5-9611-0f15c120bcb8` 保留了 AskQuestion tool use 与 `Tool not found` 回退；结构化问卷 UI 属人工观察，transcript 不含 tool result 或选项回传，因此不承诺跨模型稳定性。
 - [x] 临时仓库 `/private/tmp/sopify-cursor-managed-blackbox.WRxVtd` 完成真实 IDE managed 主链：首轮评分 `10/10`、选择 light、创建 plan 并经 writer 写 active plan/handoff 后停车；用户确认后修改唯一业务文件，经 writer 追加 `exec_001`、`verify_001` 与 handoff，方案保持 `ready_to_archive` 且未 finalize/commit。随后 Shell 直写 `active_plan.json` 被 Hook 拒绝，前后哈希一致。完整轨迹为 session `2448476f-57b8-4e1d-a522-c19e8202d658`。
 - [x] 2026-08-22 最终 Cursor 只读独立复审返回 `accept`：P0/P1 无；三个 P2 分别以真实安装对齐、AskQuestion 证据降级和 UI/文件证据分层关闭。
 - [x] README 宿主 badge、架构图与中英文产品形态 SVG 已同步 Cursor；仅修改全量宿主矩阵，封面、demo 与跨宿主场景图保持具体示例，不为凑齐宿主重绘。

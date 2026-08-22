@@ -1,6 +1,6 @@
 # Cursor 宿主接入
 
-主要目标是本地 Cursor IDE；Cursor Agent CLI 作为低频、手工 Skill 兼容面，不覆盖 Cloud Agent。支持档位保持 `BASELINE_SUPPORTED`。真实 IDE 已观察到 Plugin Rule 路由、Analyze 评分、AskQuestion tool use、managed develop、writer 写回和 Hook 拒绝明显直写；这些 baseline 证据不外推为跨模型稳定性或完整协议认证。真实 CLI 已证明用户 Plugin Rule 不会自动成为 CLI 入口，本期明确不为此增加 launcher、项目 Rule 或 runtime。
+主要目标是本地 Cursor IDE；Cursor Agent CLI 作为低频、手工 Skill 兼容面，不覆盖 Cloud Agent。支持档位保持 `BASELINE_SUPPORTED`。真实 IDE 已观察到 Plugin Rule 路由、Analyze 评分、AskQuestion 调用尝试与文本回退、managed develop、writer 写回和 Hook 拒绝明显直写；这些 baseline 证据不外推为跨模型稳定性或完整协议认证。真实 CLI 已证明用户 Plugin Rule 不会自动成为 CLI 入口，本期明确不为此增加 launcher、项目 Rule 或 runtime。
 
 ## 安装面
 
@@ -58,7 +58,7 @@ Cursor 分开报告：
 
 IDE 与 CLI 分开记录，不互相外推：
 
-1. IDE baseline 已有可观察证据：已安装 Rule 含 `alwaysApply: true`，consult 实际读取 Cursor 写作规范并保持只读；Analyze 读取 Cursor Skill 并执行评分脚本；有限选项澄清至少一次出现未再报 `Tool not found` 的 AskQuestion tool use；managed 场景按 Analyze → Design → Develop 推进，经 `sopify_writer` 写 state、handoff 与 receipts；明显 Shell 直写 machine truth 被 Hook 拒绝且文件哈希不变。
+1. IDE baseline 已有可观察证据：已安装 Rule 含 `alwaysApply: true`，consult 实际读取 Cursor 写作规范并保持只读；Analyze 读取 Cursor Skill 并执行评分脚本；有限选项澄清留下 AskQuestion tool use 与 `Tool not found` 文本回退，结构化问卷 UI 仅作为人工观察，transcript 不含 tool result 或选项回传；managed 场景按 Analyze → Design → Develop 推进，经 `sopify_writer` 写 state、handoff 与 receipts；明显 Shell 直写 machine truth 被 Hook 拒绝且文件哈希不变。
 2. IDE 未验证边界：AskQuestion 是否跨模型稳定提供、独立 `sessionStart` 行为与显式 finalize。本期依赖文本追问回退和现有协议边界，不把这些项目作为 baseline 发布阻塞。
 3. CLI（可选兼容验收）：手工调用 `/analyze`、`/design` 或 `/develop`，确认实际读取 `~/.cursor/skills/sopify` 中的目标 Skill；若验证 Hooks，保留工具调用、拒绝结果与文件哈希。不得从手工 Skill 或 Hook 通过外推自动语义入口。
 

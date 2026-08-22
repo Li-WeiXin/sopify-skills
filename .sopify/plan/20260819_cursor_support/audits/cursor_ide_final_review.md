@@ -35,7 +35,7 @@
 
 ### Plugin、consult 与 Analyze
 
-- User Rule `sopify` 已在 Cursor Customize 中显示为 Always Apply，Plugin 服务日志报告 `ruleCount: 1`。
+- 用户范围的 Sopify Plugin Rule 已在 Cursor Customize > Rules 中显示为 Always Apply，Plugin 服务日志报告 `ruleCount: 1`。
 - consult transcript：`/Users/weixin.li/.cursor/projects/Users-weixin-li-code-github-sopify/agent-transcripts/067ce461-c667-46fb-88ce-bffe4c4362a1/067ce461-c667-46fb-88ce-bffe4c4362a1.jsonl`
 - Analyze transcript：`/Users/weixin.li/.cursor/projects/Users-weixin-li-code-nio-data-sprite/agent-transcripts/7101b90b-ce5d-4acb-8fc3-930056f95e68/7101b90b-ce5d-4acb-8fc3-930056f95e68.jsonl`
 - 核验重点：consult 不加载阶段 Skill、不续旧方案、不写 machine truth；Analyze 实际读取 Cursor Skill 并执行评分脚本，低分时不进入 Design 或写文件。
@@ -43,8 +43,8 @@
 ### AskQuestion
 
 - transcript：`/Users/weixin.li/.cursor/projects/Users-weixin-li-code-nio-data-sprite/agent-transcripts/84e9fa01-c2dc-4db5-9611-0f15c120bcb8/84e9fa01-c2dc-4db5-9611-0f15c120bcb8.jsonl`
-- 同一会话包含 `AskQuestion` / `ask_question` 不可用样本，以及后续未再报 `Tool not found` 的 `AskQuestion` tool use；UI 卡片属于人工观察，transcript 不含选项回传或 `Other...`。
-- 这只证明 AskQuestion 能力路径和文本回退都存在。不要据此宣称每个模型或每次会话都会稳定提供问卷。
+- 同一会话包含 AskQuestion tool use 与 `Tool not found` 回退；结构化问卷 UI 属人工观察，transcript 不含 tool result、选项回传或 `Other...`。
+- 这只证明 AskQuestion 调用尝试与文本回退都发生过；结构化问卷 UI 仍是人工观察。不要据此宣称每个模型或每次会话都会稳定提供问卷。
 
 ### Managed 主链与 Hook
 
@@ -109,7 +109,7 @@ PYTHONDONTWRITEBYTECODE=1 /opt/homebrew/opt/python@3.11/libexec/bin/python3 scri
 - 精确裁决：`accept`；P0 无，P1 无。
 - 认可：Cursor 仍是第五个 adapter，不是 fork；用户 Plugin 薄 Rule、全局 Skills/payload 与用户 Hooks 的分层没有引入 launcher、runtime、MCP、Custom Agent 或第二套项目 Rule。
 - P2-1：复审时真实安装 Rule/README 与候选模板有文字差异。已用最终 `cursor:zh-CN` 候选原位重装并逐字核对；Hooks、CLI/User settings、MCP 文件存在状态与系统代理前后不变。
-- P2-2：AskQuestion transcript 只证明文本回退和一次未再报 `Tool not found` 的 tool use。公开文档与方案已删除“原生问卷/Other 已验证”等过强口径，不承诺跨模型稳定性或选项回传。
+- P2-2：AskQuestion transcript 证明调用尝试与文本回退，但不独立证明结构化问卷结果。公开文档与方案已删除“原生问卷/Other 已验证”等过强口径，不承诺跨模型稳定性或选项回传。
 - P2-3：本轮独立复审没有重看 Customize UI 或 `ruleCount: 1` 日志。公开证据口径以已安装 Rule 的 `alwaysApply: true`、consult/Analyze 工具轨迹和既有人工 UI 观察分层记录，不把 UI 观察写成可移植认证。
 - 自动化：最终候选 `308 passed, 78 subtests passed`；Python compileall、`bash -n install.sh`、SVG XML 与 `git diff --check` 通过。
 - 支持边界：保持 `BASELINE_SUPPORTED`。独立 sessionStart、显式 finalize、AskQuestion 跨模型稳定性、CLI 自动 Plugin Rule 与 Cloud Agent 不在本轮闭环内。

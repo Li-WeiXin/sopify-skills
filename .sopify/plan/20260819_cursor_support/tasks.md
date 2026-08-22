@@ -57,11 +57,11 @@
   - 2026-08-20 Reload 复验通过：Customize 在 User 范围显示 `sopify`，打开后真实文件为 `rules/sopify.mdc` 且为 Always Apply；多个最新窗口日志中的 Cursor Plugin 服务均为 `ruleCount: 1`。这关闭注册门，不外推 consult/Analyze 行为。
   - 2026-08-20 consult 会话 `067ce461-c667-46fb-88ce-bffe4c4362a1` 只读取 Cursor shared-writing-dna 和只读 Git 状态；Analyze 会话 `7101b90b-ce5d-4acb-8fc3-930056f95e68` 读取精确 Cursor Skill 并运行评分脚本得到 `3/10, pass=false`，两轮均无写入。
   - 2026-08-20 原位切换 `cursor:zh-CN` 后只有一个 Plugin 根和一个 Skill 根，英文阶段模板无残留；保护配置与系统代理不变。`sessionStart` 只保留自动化与既有补充线索，不把模型转述升级为独立行为通过。
-  - 2026-08-20 AskQuestion baseline 证据完成：会话 `84e9fa01-c2dc-4db5-9611-0f15c120bcb8` 保留不可用回退与后续未再报 `Tool not found` 的 `AskQuestion` tool use。UI 卡片属于人工观察，transcript 不含选项回传；本期不承诺每个模型/会话都提供。
+  - 2026-08-20 AskQuestion baseline 证据完成：会话 `84e9fa01-c2dc-4db5-9611-0f15c120bcb8` 保留 AskQuestion tool use 与 `Tool not found` 回退。UI 卡片属于人工观察，transcript 不含 tool result 或选项回传；本期不承诺每个模型/会话都提供。
   - 2026-08-22 managed 黑盒完成：临时仓库 `/private/tmp/sopify-cursor-managed-blackbox.WRxVtd` 的 session `2448476f-57b8-4e1d-a522-c19e8202d658` 完成 Analyze → Design → 停车 → Develop，业务文件精确变更，state/handoff/receipt 只经 writer 写入；直接 Shell 改写 active plan 被 Hook 拒绝且哈希不变，未 finalize/commit。
 - [x] 5.4 更新现有独立审计包，交 Cursor 只读复审；通过 `sopify_writer` 追加新的 verify receipt，不覆盖历史 receipt。
   - 前置 IDE baseline 证据已齐：Rule/consult/Analyze/AskQuestion/managed develop/writer/Hook 分别保留工具轨迹或文件结果；模型自述不单独计证据。
   - 2026-08-22 最终候选验证：308 passed / 78 subtests，Python compileall、`bash -n install.sh` 与 `git diff --check` 均通过。
-  - 最终复审返回 `accept`，P0/P1 无。其三个 P2 已以真实安装与候选对齐、AskQuestion 口径降级和 UI/文件证据分层关闭；`verify_004` 绑定最终方案版本追加。
+  - 最终复审返回 `accept`，P0/P1 无。其三个 P2 已以真实安装与候选对齐、AskQuestion 口径降级和 UI/文件证据分层关闭；后续独立审计的两处术语修正由 `verify_005` 绑定最终方案版本。
 - [x] 5.5 保持 `BASELINE_SUPPORTED`，清楚记录自动化、CLI、IDE 各自证据与缺口。
   - 独立 sessionStart、显式 finalize、AskQuestion 跨模型稳定性、CLI 自动 Plugin Rule 与 Cloud Agent 均记录为未验证或不支持边界，不阻塞本次 baseline 收口。
