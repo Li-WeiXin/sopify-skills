@@ -95,9 +95,13 @@ class HostCapabilityRegistryTests(unittest.TestCase):
         self.assertEqual(cursor.support_tier.value, "baseline_supported")
         self.assertTrue(cursor.install_enabled)
         self.assertEqual(adapter.destination_dirname, ".cursor")
-        self.assertEqual(adapter.instruction_file_relpath, ".cursor/rules/sopify.mdc")
-        self.assertTrue(adapter.is_project_rules_scope)
+        self.assertEqual(
+            adapter.instruction_file_relpath,
+            ".cursor/plugins/local/sopify/rules/sopify.mdc",
+        )
+        self.assertTrue(adapter.is_user_plugin_scope)
         self.assertFalse(adapter.is_workspace_scope)
+        self.assertFalse(adapter.requires_workspace)
         self.assertIsNone(adapter.skills_cli_agent)
         self.assertEqual(adapter.skill_install_dirname, ".cursor/skills")
         self.assertEqual(cursor.smoke_targets, ())
@@ -119,33 +123,47 @@ class HostCapabilityRegistryTests(unittest.TestCase):
                 home_root=home_root,
             )
 
-            rule = workspace_root / ".cursor" / "rules" / "sopify.mdc"
+            plugin_root = home_root / ".cursor" / "plugins" / "local" / "sopify"
+            manifest = plugin_root / ".cursor-plugin" / "plugin.json"
+            rule = plugin_root / "rules" / "sopify.mdc"
+            readme = plugin_root / "README.md"
             skill_root = home_root / ".cursor" / "skills" / "sopify"
+            self.assertTrue(manifest.is_file())
             self.assertTrue(rule.is_file())
+            self.assertTrue(readme.is_file())
+            manifest_payload = json.loads(manifest.read_text(encoding="utf-8"))
+            self.assertNotIn("rules", manifest_payload)
+            self.assertIn("adaptive workflow layer", readme.read_text(encoding="utf-8"))
+            self.assertIn("BASELINE_SUPPORTED", readme.read_text(encoding="utf-8"))
             self.assertTrue((skill_root / "analyze" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "design" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "develop" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "kb" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "templates" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "references" / "shared-writing-dna.md").is_file())
+            self.assertTrue((skill_root / "references" / "output-contract.md").is_file())
+            self.assertTrue((skill_root / "analyze" / "scripts" / "score_requirement.py").is_file())
             self.assertTrue((home_root / ".cursor" / "sopify" / "payload-manifest.json").is_file())
             self.assertTrue((home_root / ".cursor" / "sopify" / "bundles").is_dir())
             self.assertEqual(settings.read_text(encoding="utf-8"), '{"proxy": "127.0.0.1:7898"}\n')
             self.assertFalse((home_root / ".cursor" / "AGENTS.md").exists())
             self.assertFalse((workspace_root / ".cursor" / "skills").exists())
+            self.assertFalse((workspace_root / ".cursor").exists())
             self.assertFalse((workspace_root / ".sopify").exists())
             self.assertFalse((workspace_root / ".cursor" / "hooks.json").exists())
             self.assertTrue((home_root / ".cursor" / "hooks.json").is_file())
             self.assertTrue((home_root / ".cursor" / "sopify" / "helpers" / "cursor_hook.py").is_file())
             self.assertIn("alwaysApply: true", rule.read_text(encoding="utf-8"))
             self.assertIn("~/.cursor/skills/sopify/references/shared-writing-dna.md", rule.read_text(encoding="utf-8"))
+            self.assertIn("Cursor IDE", rule.read_text(encoding="utf-8"))
+            self.assertIn("does not automatically load", rule.read_text(encoding="utf-8"))
             self.assertNotIn(str(skill_root), rule.read_text(encoding="utf-8"))
             self.assertIsNone(result.workspace_bootstrap)
             self.assertEqual(result.target.host, "cursor")
 
             doctor = build_doctor_payload(home_root=home_root, workspace_root=workspace_root)
             cursor_checks = {check["check_id"]: check for check in doctor["checks"] if check.get("host_id") == "cursor"}
-            self.assertEqual(cursor_checks["project_rule_present"]["status"], "pass")
+            self.assertEqual(cursor_checks["cursor_plugin_present"]["status"], "pass")
             self.assertEqual(cursor_checks["global_skill_tree_present"]["status"], "pass")
             self.assertEqual(cursor_checks["payload_present"]["status"], "pass")
             self.assertEqual(cursor_checks["cursor_hooks_present"]["status"], "pass")
@@ -164,6 +182,39 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             self.assertEqual(cursor_status["state"]["installed"], "yes")
             self.assertEqual(cursor_status["state"]["configured"], "yes")
             self.assertEqual(cursor_status["state"]["workspace_bundle_healthy"], "not_requested")
+
+            readme.unlink()
+            doctor_without_readme = build_doctor_payload(
+                home_root=home_root,
+                workspace_root=workspace_root,
+            )
+            plugin_check = next(
+                check
+                for check in doctor_without_readme["checks"]
+                if check.get("host_id") == "cursor"
+                and check["check_id"] == "cursor_plugin_present"
+            )
+            self.assertEqual(plugin_check["status"], "pass")
+
+            status_without_readme = build_status_payload(
+                home_root=home_root,
+                workspace_root=workspace_root,
+            )
+            cursor_without_readme = next(
+                host
+                for host in status_without_readme["hosts"]
+                if host["host_id"] == "cursor"
+            )
+            self.assertEqual(cursor_without_readme["state"]["installed"], "yes")
+
+            repair_result = run_install(
+                target_value="cursor",
+                workspace_value=str(workspace_root),
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+            )
+            self.assertEqual(repair_result.host_install.action, "updated")
+            self.assertTrue(readme.is_file())
 
     def test_cursor_install_preflights_invalid_hooks_before_any_product_write(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
@@ -185,7 +236,7 @@ class HostCapabilityRegistryTests(unittest.TestCase):
 
             self.assertEqual(hooks.read_text(encoding="utf-8"), "{not json\n")
             self.assertEqual(settings.read_text(encoding="utf-8"), '{"proxy": "127.0.0.1:7898"}\n')
-            self.assertFalse((workspace_root / ".cursor" / "rules" / "sopify.mdc").exists())
+            self.assertFalse((home_root / ".cursor" / "plugins" / "local" / "sopify").exists())
             self.assertFalse((home_root / ".cursor" / "skills" / "sopify").exists())
             self.assertFalse((home_root / ".cursor" / "sopify").exists())
 
@@ -218,7 +269,7 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             self.assertEqual(cursor_hooks["status"], "fail")
             self.assertTrue(any("Stale or unsafe" in item for item in cursor_hooks.get("evidence", [])))
 
-    def test_project_rules_surface_does_not_implicitly_install_cursor_hooks(self) -> None:
+    def test_user_plugin_surface_is_not_a_generic_hook_framework(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
             home_root = Path(home_dir)
             workspace_root = Path(workspace_dir)
@@ -231,12 +282,13 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             )
 
             with patch("scripts.install_sopify.get_host_adapter", return_value=future_adapter):
-                run_install(
-                    target_value="cursor",
-                    workspace_value=str(workspace_root),
-                    repo_root=REPO_ROOT,
-                    home_root=home_root,
-                )
+                with self.assertRaisesRegex(InstallError, "incompatible host adapter"):
+                    run_install(
+                        target_value="cursor",
+                        workspace_value=str(workspace_root),
+                        repo_root=REPO_ROOT,
+                        home_root=home_root,
+                    )
 
             self.assertFalse((home_root / ".cursor" / "hooks.json").exists())
             self.assertFalse(
@@ -252,11 +304,11 @@ class HostCapabilityRegistryTests(unittest.TestCase):
 
             doctor = build_doctor_payload(home_root=home_root, workspace_root=None)
             cursor_checks = {check["check_id"]: check for check in doctor["checks"] if check.get("host_id") == "cursor"}
-            self.assertEqual(cursor_checks["project_rule_present"]["status"], "skip")
+            self.assertEqual(cursor_checks["cursor_plugin_present"]["status"], "skip")
             self.assertEqual(cursor_checks["global_skill_tree_present"]["status"], "skip")
             self.assertEqual(cursor_checks["payload_present"]["status"], "skip")
             self.assertEqual(cursor_checks["cursor_hooks_present"]["status"], "skip")
-            self.assertNotEqual(cursor_checks["project_rule_present"]["status"], "fail")
+            self.assertNotEqual(cursor_checks["cursor_plugin_present"]["status"], "fail")
             self.assertEqual(doctor["summary"]["fail_count"], 0)
 
             status = build_status_payload(home_root=home_root, workspace_root=None)
@@ -291,7 +343,7 @@ class HostCapabilityRegistryTests(unittest.TestCase):
 
             self.assertEqual(cursor_hooks["status"], "fail")
 
-    def test_cursor_status_installed_requires_rule_and_skills_when_workspace_requested(self) -> None:
+    def test_cursor_status_installed_requires_plugin_and_skills(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
             home_root = Path(home_dir)
             workspace_root = Path(workspace_dir)
@@ -301,15 +353,49 @@ class HostCapabilityRegistryTests(unittest.TestCase):
                 repo_root=REPO_ROOT,
                 home_root=home_root,
             )
-            (workspace_root / ".cursor" / "rules" / "sopify.mdc").unlink()
+            plugin_rule = (
+                home_root / ".cursor" / "plugins" / "local" / "sopify" / "rules" / "sopify.mdc"
+            )
+            plugin_rule.unlink()
 
             missing_rule = build_status_payload(home_root=home_root, workspace_root=workspace_root)
             cursor_missing = next(host for host in missing_rule["hosts"] if host["host_id"] == "cursor")
             self.assertEqual(cursor_missing["state"]["installed"], "no")
 
-            skills_only = build_status_payload(home_root=home_root, workspace_root=None)
-            cursor_skills_only = next(host for host in skills_only["hosts"] if host["host_id"] == "cursor")
-            self.assertEqual(cursor_skills_only["state"]["installed"], "yes")
+            run_install(
+                target_value="cursor",
+                workspace_value=None,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+            )
+            (home_root / ".cursor" / "skills" / "sopify" / "analyze" / "SKILL.md").unlink()
+            missing_skill = build_status_payload(home_root=home_root, workspace_root=None)
+            cursor_missing_skill = next(host for host in missing_skill["hosts"] if host["host_id"] == "cursor")
+            self.assertEqual(cursor_missing_skill["state"]["installed"], "no")
+
+            for required_path in (
+                home_root / ".cursor" / "skills" / "sopify" / "references" / "output-contract.md",
+                home_root
+                / ".cursor"
+                / "skills"
+                / "sopify"
+                / "analyze"
+                / "scripts"
+                / "score_requirement.py",
+            ):
+                with self.subTest(required_path=required_path):
+                    run_install(
+                        target_value="cursor",
+                        workspace_value=None,
+                        repo_root=REPO_ROOT,
+                        home_root=home_root,
+                    )
+                    required_path.unlink()
+                    incomplete = build_status_payload(home_root=home_root, workspace_root=None)
+                    cursor_incomplete = next(
+                        host for host in incomplete["hosts"] if host["host_id"] == "cursor"
+                    )
+                    self.assertEqual(cursor_incomplete["state"]["installed"], "no")
 
 
 class StatusDoctorContractTests(unittest.TestCase):

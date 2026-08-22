@@ -13,6 +13,7 @@
 [![Claude](https://img.shields.io/badge/host-Claude-CC785C.svg?style=for-the-badge)](#quick-start)
 [![Qoder](https://img.shields.io/badge/host-Qoder-7C3AED.svg?style=for-the-badge)](#quick-start)
 [![Copilot](https://img.shields.io/badge/host-Copilot-000000.svg?style=for-the-badge)](#quick-start)
+[![Cursor](https://img.shields.io/badge/host-Cursor-111827.svg?style=for-the-badge)](./docs/cursor-host.md)
 
 English · [简体中文](./README.zh-CN.md) · [Quick Start](#quick-start) · [Contributors](./CONTRIBUTORS.md)
 
@@ -26,14 +27,14 @@ English · [简体中文](./README.zh-CN.md) · [Quick Start](#quick-start) · [
 
 AI coding tools are fast. But when they jump to code before the facts are clear, speed turns into rework. Sopify is a development process protocol layer for AI coding: in managed workflows, the host asks before coding when requirements are incomplete or a decision still needs you.
 
-Sopify stores plans and verification receipts in `.sopify/` as project files tracked by git. Only the local resume pointers stay out of git. In the same repo, explicitly ask to continue or use `~go` to resume managed work from those files on any supported host.
+Sopify stores plans and verification receipts in `.sopify/` as project files tracked by git. Only the local resume pointers stay out of git. In the same repo, use the managed entry supported by your current host to resume from those files; entry shape and verification level stay explicit in the host support matrix.
 
 No new editor, no new CLI. Install into the host you already use — Codex, Claude, Qoder, Copilot, or Cursor.
 
 **Design principles:**
 
 - **Stop when unsure** — score every requirement; ask before assuming
-- **Resume from anywhere** — plans and verification receipts are tracked in `.sopify/`; open the repo on any host and pick up where you left off
+- **Resume across managed hosts** — plans and verification receipts are tracked in `.sopify/`; hosts with continuation support can pick up where you left off
 - **Trace every decision** — plans, choices, and reviews persist in `.sopify/`
 
 **What Sopify prevents:**
@@ -99,7 +100,7 @@ The host LLM executes. Sopify supplies shared workflow rules and preserves plans
 
 Sopify does three things:
 
-- **Shared workflow rules** — supported hosts load the same Sopify workflow rules, so switching hosts does not change the process and boundaries you already confirmed
+- **Shared workflow protocol** — each adapter delivers the same protocol through the host surfaces it supports; entry mode and verification level remain explicit
 - **Git-tracked project record** — plans, decisions, and verification evidence travel with the repository; local pointers do not
 - **Explicit resume and closeout** — ask to continue or use `~go` before the host resumes; `~go finalize` archives the plan only after delivery evidence is ready
 
@@ -137,9 +138,9 @@ Host support:
 | Claude | PROTOCOL_VERIFIED | `claude:en-US` / `claude:zh-CN` | Full capability continuation |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | Validated on Qoder CLI |
 | Copilot | BASELINE_SUPPORTED | `copilot:en-US` / `copilot:zh-CN` | Prompt-only; payload uplift planned |
-| Cursor | BASELINE_SUPPORTED | `cursor` | Local IDE + Agent CLI; project rule, global Skills/payload, and user-level hooks; behavior black-box pending |
+| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor` | IDE user Plugin + global Skills/payload + user hooks; observable IDE baseline evidence, CLI uses Skills manually |
 
-Pass `--workspace <path>` to target another repo, `--language <lang>` to control output language.
+Pass `--workspace <path>` to target another repo for workspace-scope or prewarm installs; Cursor installs once at user scope and does not require it. Use `--language <lang>` to control output language.
 
 [EvidentLoop](https://github.com/evidentloop/evidentloop) is an optional code-change audit
 tool. It turns a local Git diff into an interactive report, ties audit findings to changed

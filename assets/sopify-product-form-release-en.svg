@@ -40,9 +40,9 @@
     <text x="94" y="144" class="stage-num" font-family="-apple-system,'Helvetica Neue',sans-serif">I</text>
     <text x="112" y="144" class="lbl" font-family="-apple-system,'Helvetica Neue',sans-serif">HOST</text>
     <text x="94" y="170" class="stage-title" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">User asks in a supported host</text>
-    <text x="94" y="186" class="stage-sub" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">One protocol, four entry points</text>
+    <text x="94" y="186" class="stage-sub" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">One protocol, five host adapters</text>
 
-    <!-- 4 host cards, ALL 96px wide. L-col right=190, R-col right=296. Stage right=310. -->
+    <!-- 5 host cards, ALL 96px wide. L-col right=190, R-col right=296. Stage right=310. -->
     <g transform="translate(94,206)" filter="url(#shadowSoft)">
       <rect width="96" height="44" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1.3"/>
       <circle cx="14" cy="22" r="3.5" fill="#10b981"/>
@@ -68,12 +68,19 @@
       <text x="24" y="34" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">verified</text>
     </g>
 
-    <text x="94" y="336" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Same .sopify/ project</text>
-    <text x="94" y="352" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Supported hosts load the same rules</text>
-    <text x="94" y="368" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Project records stay consistent</text>
+    <g transform="translate(147,314)" filter="url(#shadowSoft)">
+      <rect width="96" height="44" rx="6" fill="#fff7ed" stroke="#fbbf24" stroke-width="1.3" stroke-dasharray="3,2"/>
+      <circle cx="14" cy="22" r="3.5" fill="#fbbf24"/>
+      <text x="24" y="20" class="nm" font-family="-apple-system,'Helvetica Neue',sans-serif">Cursor</text>
+      <text x="24" y="34" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">baseline</text>
+    </g>
 
-    <text x="94" y="438" class="fn" font-family="'Cascadia Code','SF Mono','Courier New',monospace">~go</text>
-    <text x="120" y="438" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif"> · user starts the work</text>
+    <text x="94" y="374" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Same .sopify/ project</text>
+    <text x="94" y="390" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Supported hosts consume one protocol</text>
+    <text x="94" y="406" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">Project records stay consistent</text>
+
+    <text x="94" y="438" class="fn" font-family="'Cascadia Code','SF Mono','Courier New',monospace">request</text>
+    <text x="136" y="438" class="sm" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif"> · user starts the work</text>
   </g>
 
   <!-- Arrow 1 → 2 (gap 310→370, center x=340) -->
@@ -241,5 +248,5 @@
     <text x="700" y="2" class="sm" font-family="-apple-system,'Helvetica Neue',sans-serif">baseline</text>
   </g>
 
-  <text x="1470" y="622" text-anchor="end" class="foot" font-family="-apple-system,'Helvetica Neue',sans-serif">Sopify · 2026-06</text>
+  <text x="1470" y="622" text-anchor="end" class="foot" font-family="-apple-system,'Helvetica Neue',sans-serif">Sopify · 2026-08</text>
 </svg>

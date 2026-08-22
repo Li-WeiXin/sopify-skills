@@ -176,12 +176,9 @@ class HostInspection:
                 },
             }
         configured = self.payload.status == CHECK_PASS
-        if self.adapter.is_project_rules_scope:
+        if self.adapter.is_user_plugin_scope:
             skill_ok = self.global_skill_tree is not None and self.global_skill_tree.status == CHECK_PASS
-            if self.host_prompt.reason_code == REASON_WORKSPACE_NOT_REQUESTED:
-                installed = skill_ok
-            else:
-                installed = skill_ok and self.host_prompt.status == CHECK_PASS
+            installed = skill_ok and self.host_prompt.status == CHECK_PASS
             return {
                 **self.capability.to_dict(),
                 "state": {
@@ -213,7 +210,7 @@ class HostInspection:
             self.payload,
             self.payload_bundle.to_check(host_id=self.capability.host_id),
         ]
-        if not self.adapter.is_project_rules_scope:
+        if not self.adapter.is_user_plugin_scope:
             checks.extend((self.workspace_bundle, self.handoff_first))
         for check in (self.global_skill_tree, self.user_hooks, self.ide_behavior, self.cli_behavior):
             if check is not None:
@@ -278,7 +275,7 @@ def inspect_host(
     adapter = registration.adapter
     capability = registration.capability
     if _host_is_absent(adapter=adapter, home_root=home_root, workspace_root=workspace_root):
-        project_rule_check_id = "project_rule_present" if adapter.is_project_rules_scope else "host_prompt_present"
+        project_rule_check_id = "cursor_plugin_present" if adapter.is_user_plugin_scope else "host_prompt_present"
         skipped = InspectionCheck(
             host_id=capability.host_id,
             check_id=project_rule_check_id,
@@ -325,7 +322,7 @@ def inspect_host(
                 capability=capability,
                 check_id="global_skill_tree_present",
                 reason_code="HOST_NOT_INSTALLED",
-            ) if adapter.is_project_rules_scope else None,
+            ) if adapter.is_user_plugin_scope else None,
             user_hooks=_cursor_not_verified_check(
                 capability=capability,
                 check_id="cursor_hooks_present",
@@ -338,7 +335,7 @@ def inspect_host(
     payload = _inspect_payload(adapter=adapter, capability=capability, home_root=home_root)
     global_skill_tree = (
         _inspect_global_skill_tree(adapter=adapter, capability=capability, home_root=home_root)
-        if adapter.is_project_rules_scope
+        if adapter.is_user_plugin_scope
         else None
     )
     user_hooks = (
@@ -347,10 +344,10 @@ def inspect_host(
         else None
     )
     payload_bundle = inspect_payload_bundle_resolution(payload_root=adapter.payload_root(home_root), host_id=capability.host_id)
-    if workspace_root is None or adapter.is_project_rules_scope:
+    if workspace_root is None or adapter.is_user_plugin_scope:
         workspace_recommendation = (
-            "Cursor does not auto-bootstrap `.sopify`. Trigger Sopify in the project to bootstrap on demand."
-            if adapter.is_project_rules_scope
+            "The Cursor user Plugin install does not modify a project. Trigger a managed workflow in the target repository to initialize `.sopify` on demand."
+            if adapter.is_user_plugin_scope
             else "Workspace bootstrap was not requested. Trigger Sopify in a project workspace to bootstrap on demand."
         )
         workspace_bundle = InspectionCheck(
@@ -733,17 +730,14 @@ def _protocol_state_checks(workspace_state: dict[str, object]) -> tuple[Inspecti
 
 
 def _inspect_host_prompt(*, adapter: HostAdapter, capability: HostCapability, home_root: Path, workspace_root: Path | None = None) -> InspectionCheck:
-    check_id = "project_rule_present" if adapter.is_project_rules_scope else "host_prompt_present"
-    if adapter.is_project_rules_scope and workspace_root is None:
-        return InspectionCheck(
-            host_id=capability.host_id,
-            check_id=check_id,
-            status=CHECK_SKIP,
-            reason_code=REASON_WORKSPACE_NOT_REQUESTED,
-            recommendation="Pass --workspace-root to verify the Cursor project rule in a specific repository.",
-        )
+    check_id = "cursor_plugin_present" if adapter.is_user_plugin_scope else "host_prompt_present"
     try:
-        if adapter.requires_workspace:
+        if adapter.is_user_plugin_scope:
+            paths = adapter.user_plugin_paths(home_root)
+            missing = [path for path in paths if not path.exists()]
+            if missing:
+                raise InstallError(f"Host install verification failed: {missing[0]}")
+        elif adapter.requires_workspace:
             if workspace_root is None:
                 raise InstallError("Workspace-scope host requires --workspace for verification")
             paths = adapter.workspace_expected_paths(workspace_root)
@@ -798,7 +792,10 @@ def _inspect_cursor_hooks(*, adapter: HostAdapter, capability: HostCapability, h
 
 def _inspect_global_skill_tree(*, adapter: HostAdapter, capability: HostCapability, home_root: Path) -> InspectionCheck:
     try:
-        paths = validate_host_install(adapter, home_root=home_root)
+        paths = adapter.global_skill_paths(home_root)
+        missing = [path for path in paths if not path.exists()]
+        if missing:
+            raise InstallError(f"Host install verification failed: {missing[0]}")
         return InspectionCheck(
             host_id=capability.host_id,
             check_id="global_skill_tree_present",
@@ -837,12 +834,20 @@ def _cursor_not_verified_check(
 
 
 def _cursor_behavior_check(*, capability: HostCapability, check_id: str) -> InspectionCheck:
-    surface = "Cursor IDE" if check_id == "cursor_ide_behavior" else "Cursor Agent CLI"
+    if check_id == "cursor_ide_behavior":
+        recommendation = (
+            "Run the Cursor IDE black-box acceptance flow; file presence alone is not behavior evidence."
+        )
+    else:
+        recommendation = (
+            "Optionally run the Cursor Agent CLI manual-Skill and Hook black-box flow. "
+            "Automatic loading of the user Plugin Rule is not a supported CLI entry."
+        )
     return _cursor_not_verified_check(
         capability=capability,
         check_id=check_id,
         reason_code="BLACK_BOX_NOT_VERIFIED",
-        recommendation=f"Run the {surface} black-box acceptance flow; file presence alone is not behavior evidence.",
+        recommendation=recommendation,
     )
 
 
@@ -1311,13 +1316,11 @@ def _host_is_absent(*, adapter: HostAdapter, home_root: Path, workspace_root: Pa
         if workspace_root is None:
             return True
         return not any(p.exists() for p in adapter.workspace_expected_paths(workspace_root))
-    if adapter.is_project_rules_scope:
+    if adapter.is_user_plugin_scope:
         owned = [
             *adapter.expected_paths(home_root),
             adapter.payload_root(home_root),
         ]
-        if workspace_root is not None:
-            owned.extend(adapter.workspace_expected_paths(workspace_root))
         return not any(path.exists() for path in owned) and not (
             adapter.host_name == "cursor" and sopify_hook_entries_present(home_root=home_root)
         )

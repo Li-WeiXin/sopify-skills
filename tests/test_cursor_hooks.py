@@ -20,10 +20,13 @@ from installer.models import InstallError
 
 
 def _enable_workspace(root: Path) -> Path:
-    rule = root / ".cursor" / "rules" / "sopify.mdc"
-    rule.parent.mkdir(parents=True, exist_ok=True)
-    rule.write_text("---\nalwaysApply: true\n---\n", encoding="utf-8")
+    (root / ".sopify").mkdir(parents=True, exist_ok=True)
     return root
+
+
+def _write_light_plan(plan_dir: Path) -> None:
+    plan_dir.mkdir(parents=True, exist_ok=True)
+    (plan_dir / "plan.md").write_text("---\nlevel: light\n---\n# Plan\n", encoding="utf-8")
 
 
 def _payload_with_helper(home_root: Path) -> Path:
@@ -34,7 +37,7 @@ def _payload_with_helper(home_root: Path) -> Path:
 
 
 class CursorHookHelperTests(unittest.TestCase):
-    def test_noop_without_project_rule(self) -> None:
+    def test_noop_without_managed_root(self) -> None:
         with tempfile.TemporaryDirectory() as workspace_dir:
             workspace = Path(workspace_dir)
             self.assertEqual(
@@ -73,7 +76,7 @@ class CursorHookHelperTests(unittest.TestCase):
             )
             plan_dir = workspace / ".sopify" / "plan" / "20260819_cursor_support"
             (plan_dir / "receipts").mkdir(parents=True)
-            (plan_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
+            _write_light_plan(plan_dir)
             (plan_dir / "receipts" / "exec_001.json").write_text("{}\n", encoding="utf-8")
 
             result = handle(
@@ -104,8 +107,7 @@ class CursorHookHelperTests(unittest.TestCase):
                 encoding="utf-8",
             )
             plan_dir = workspace / ".sopify" / "plan" / "plan_a"
-            plan_dir.mkdir(parents=True)
-            (plan_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
+            _write_light_plan(plan_dir)
 
             result = handle(
                 {
@@ -127,7 +129,7 @@ class CursorHookHelperTests(unittest.TestCase):
             plan_dir = workspace / ".sopify" / "plan" / "plan_a"
             receipts = plan_dir / "receipts"
             receipts.mkdir(parents=True)
-            (plan_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
+            _write_light_plan(plan_dir)
             (receipts / "exec_002.json").write_text(
                 json.dumps(
                     {
@@ -162,7 +164,7 @@ class CursorHookHelperTests(unittest.TestCase):
             plan_dir = workspace / ".sopify" / "plan" / "plan_a"
             receipts = plan_dir / "receipts"
             receipts.mkdir(parents=True)
-            (plan_dir / "plan.md").write_text("# plan\n", encoding="utf-8")
+            _write_light_plan(plan_dir)
             (receipts / "exec_100.json").write_text("{}\n", encoding="utf-8")
             (receipts / "verify_999.json").write_text("{}\n", encoding="utf-8")
 
@@ -181,6 +183,7 @@ class CursorHookHelperTests(unittest.TestCase):
                     json.dumps({"plan_id": plan_id}),
                     encoding="utf-8",
                 )
+                _write_light_plan(workspace / ".sopify" / "plan" / plan_id)
 
             ambiguous = handle(
                 {
@@ -201,6 +204,24 @@ class CursorHookHelperTests(unittest.TestCase):
             )["additional_context"]
             self.assertIn("active_plan: plan_second", selected)
             self.assertNotIn("plan_first", selected)
+
+    def test_session_start_skips_invalid_plan_package(self) -> None:
+        with tempfile.TemporaryDirectory() as workspace_dir:
+            workspace = _enable_workspace(Path(workspace_dir))
+            state = workspace / ".sopify" / "state"
+            state.mkdir(parents=True)
+            (state / "active_plan.json").write_text(
+                json.dumps({"plan_id": "plan_a"}),
+                encoding="utf-8",
+            )
+            plan_dir = workspace / ".sopify" / "plan" / "plan_a"
+            plan_dir.mkdir(parents=True)
+            (plan_dir / "plan.md").write_text("# missing contract frontmatter\n", encoding="utf-8")
+
+            self.assertEqual(
+                handle({"hook_event_name": "sessionStart", "workspace_roots": [str(workspace)]}),
+                {},
+            )
 
     def test_pre_tool_use_denies_strreplace_on_state_allows_plan_docs(self) -> None:
         with tempfile.TemporaryDirectory() as workspace_dir:

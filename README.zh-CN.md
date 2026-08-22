@@ -13,6 +13,7 @@
 [![Claude](https://img.shields.io/badge/host-Claude-CC785C.svg?style=for-the-badge)](#快速开始)
 [![Qoder](https://img.shields.io/badge/host-Qoder-7C3AED.svg?style=for-the-badge)](#快速开始)
 [![Copilot](https://img.shields.io/badge/host-Copilot-000000.svg?style=for-the-badge)](#快速开始)
+[![Cursor](https://img.shields.io/badge/host-Cursor-111827.svg?style=for-the-badge)](./docs/cursor-host.md)
 
 [English](./README.md) · 简体中文 · [快速开始](#快速开始) · [贡献者](./CONTRIBUTORS.md)
 
@@ -26,14 +27,14 @@
 
 AI 工具写代码很快。但在事实没搞清、关键决策还没拍板前就直接动手，快就会变成返工。Sopify 是 AI 编程的开发过程协议层：在托管流程里，需求不全或决策未定时，宿主会先追问，再写代码。
 
-Sopify 把方案和验证收据保存在 `.sopify/` 中，作为可纳入 git 的项目文件；只有恢复用的本地指针不进 git。在同一个仓库中，明确说“继续”或使用 `~go`，任一受支持的宿主都可以读取这些文件，从上次停点恢复托管任务。
+Sopify 把方案和验证收据保存在 `.sopify/` 中，作为可纳入 git 的项目文件；只有恢复用的本地指针不进 git。在同一个仓库中，通过当前宿主已支持的托管入口从这些文件接续；具体入口与验证档位以宿主支持矩阵为准。
 
 无需新编辑器、无需新 CLI。安装到你已有的宿主：Codex、Claude、Qoder、Copilot、Cursor 均支持。
 
 **设计原则：**
 
 - **不确定就停下** — 需求不全时先追问，再动手
-- **随时恢复** — 方案和验证收据都持久保存在 `.sopify/` 里；换宿主、换机器、换人接手都能从项目状态继续
+- **跨托管宿主恢复** — 方案和验证收据都持久保存在 `.sopify/` 里；支持接续的宿主可从项目状态继续
 - **决策留痕** — 方案、取舍、审查持久保存在 `.sopify/`
 
 **Sopify 主要在防什么：**
@@ -98,7 +99,7 @@ Sopify 需要 Python 3.11 或更高版本；安装器会在下载前检查。这
 
 Sopify 主要做三件事：
 
-- **共享工作流规则** — 支持的宿主加载同一套 Sopify 工作流规则，换宿主也不会改变已经确认的流程和边界
+- **共享工作流协议** — 各适配器通过宿主已支持的入口交付同一协议；入口形态与验证档位保持显式
 - **项目记录随 Git 携带** — 方案、决策和验证证据跟着仓库走，本地指针不跟随
 - **明确接续与收口** — 说“继续”或输入 `~go` 后，宿主才会恢复；交付证据就绪后，`~go finalize` 才归档方案
 
@@ -136,9 +137,9 @@ Get-Content sopify-install.ps1 | more
 | Claude | PROTOCOL_VERIFIED | `claude:zh-CN` / `claude:en-US` | 全能力接续 |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | 已在 Qoder CLI 验证 |
 | Copilot | BASELINE_SUPPORTED | `copilot:zh-CN` / `copilot:en-US` | 仅 prompt；payload 升级计划中 |
-| Cursor | BASELINE_SUPPORTED | `cursor` | 本地 IDE + Agent CLI；项目规则、全局 Skills/payload 与用户级 Hooks；行为黑盒待验 |
+| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor` | IDE 用户 Plugin + 全局 Skills/payload + 用户 Hooks；IDE baseline 已有可观察证据，CLI 手工调用 Skills |
 
-可用 `--workspace <path>` 指定目标仓库，`--language <lang>` 控制输出语言。
+可用 `--workspace <path>` 指定目标仓库，`--language <lang>` 控制输出语言；Cursor 为用户级一次安装，不需要 `--workspace`。
 
 [EvidentLoop](https://github.com/evidentloop/evidentloop) 是一个可选的代码变更审计工具，
 可基于本地 Git diff 生成交互式报告，将审计发现定位到具体修改行，并支持用户通过反馈

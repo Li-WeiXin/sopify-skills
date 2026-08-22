@@ -213,7 +213,7 @@ class DistributionFacadeTests(unittest.TestCase):
             self.assertIn("workspace outcome: stub_selected [continue]", rendered)
             self.assertIn("workspace bundle: pass (STUB_SELECTED)", rendered)
 
-    def test_cursor_distribution_reports_project_rule_without_prewarm(self) -> None:
+    def test_cursor_distribution_reports_user_plugin_without_project_write(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:
             home_root = Path(home_dir)
             workspace_root = Path(workspace_dir)
@@ -237,14 +237,27 @@ class DistributionFacadeTests(unittest.TestCase):
             )
 
             rendered = render_distribution_user_result(report)
-            rule_path = workspace_root.resolve() / ".cursor" / "rules" / "sopify.mdc"
-            self.assertIn(f"项目规则：{rule_path}", rendered)
-            self.assertIn("未初始化 .sopify 工作区状态", rendered)
-            self.assertIn("使用前请在 Cursor Settings > Rules 中确认", rendered)
-            self.assertNotIn("项目规则会自动加载", rendered)
+            rule_path = (
+                home_root.resolve()
+                / ".cursor"
+                / "plugins"
+                / "local"
+                / "sopify"
+                / "rules"
+                / "sopify.mdc"
+            )
+            readme_path = rule_path.parent.parent / "README.md"
+            self.assertIn(f"用户 Plugin 规则：{rule_path}", rendered)
+            self.assertTrue(readme_path.is_file())
+            self.assertIn("自适应工作流层", readme_path.read_text(encoding="utf-8"))
+            self.assertIn("未修改任何项目目录", rendered)
+            self.assertIn("Developer: Reload Window", rendered)
+            self.assertIn("确认 Sopify Plugin 及其 Always Rule 已启用", rendered)
+            self.assertFalse((workspace_root / ".cursor").exists())
+            self.assertFalse((workspace_root / ".sopify").exists())
             self.assertNotIn("已预热", rendered)
             verbose = render_distribution_result(report)
-            self.assertIn(f"workspace: project rule installed at {rule_path}", verbose)
+            self.assertIn(f"workspace: project unchanged; user Plugin rule installed at {rule_path}", verbose)
             self.assertNotIn("workspace: pre-warmed", verbose)
 
     def test_distribution_install_rejects_ambiguous_nested_workspace_prewarm(self) -> None:

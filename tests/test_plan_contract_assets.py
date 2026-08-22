@@ -118,7 +118,7 @@ class PlanContractAssetTests(unittest.TestCase):
                     self.assertIn("architecture", rendered)
                     self.assertNotIn("light/standard/full", rendered)
 
-    def test_cursor_project_rule_uses_legal_frontmatter_and_thin_routing_contract(self) -> None:
+    def test_cursor_plugin_rule_uses_legal_frontmatter_and_thin_routing_contract(self) -> None:
         render_script = REPO_ROOT / "scripts" / "render-host-skills.py"
         for language in ("en", "zh"):
             with self.subTest(language=language), tempfile.TemporaryDirectory() as temp_dir:
@@ -148,9 +148,21 @@ class PlanContractAssetTests(unittest.TestCase):
                 self.assertIn("~/.cursor/skills/sopify/references/shared-writing-dna.md", rendered)
                 self.assertIn("scripts/score_requirement.py", rendered)
                 self.assertIn("auto_decide", rendered)
+                self.assertIn("AskQuestion", rendered)
+                self.assertIn("ask_question", rendered)
+                self.assertIn("GetMcpTools", rendered)
+                self.assertIn("Design/Develop", rendered)
+                self.assertIn(
+                    "free-form input" if language == "en" else "自由输入", rendered
+                )
                 self.assertNotRegex(rendered, r"(?m)^/.+/.cursor/skills/sopify")
                 self.assertIn("analyze/SKILL.md", rendered)
                 self.assertIn("consult_readonly", rendered)
+                self.assertIn("IDE Entry" if language == "en" else "IDE 入口", rendered)
+                self.assertIn(
+                    "does not automatically load" if language == "en" else "不会自动加载",
+                    rendered,
+                )
                 self.assertIn("~/.claude", rendered)
                 self.assertIn("~/.codex", rendered)
                 self.assertIn("state/active_plan.json", rendered)

@@ -109,7 +109,7 @@ Layer notes:
 | Claude | PROTOCOL_VERIFIED | `install.sh --target claude:en-US` | Full capability continuation |
 | Qoder | PROTOCOL_VERIFIED | `install.sh --target qoder` | Validated on Qoder CLI |
 | Copilot | BASELINE_SUPPORTED | `install.sh --target copilot` | Prompt-only; payload uplift planned |
-| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor --workspace <path>` | Project rule + global Skills/payload + user-level hooks; IDE/CLI behavior black-box pending |
+| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor` | IDE user Plugin + global Skills/payload + user hooks; observable IDE baseline evidence, CLI invokes Skills manually |
 
 ## Appendix: Plan Lifecycle
 

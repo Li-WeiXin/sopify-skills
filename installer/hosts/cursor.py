@@ -1,19 +1,19 @@
-"""Cursor IDE and Cursor Agent CLI host adapter."""
+"""Cursor IDE adapter with optional Agent CLI Skill and Hook compatibility."""
 
 from __future__ import annotations
 
 from installer.models import EntryMode, FeatureId, HostCapability, SupportTier
 
-from .base import INSTRUCTION_SURFACE_PROJECT_RULES, HostAdapter, HostRegistration
+from .base import INSTRUCTION_SURFACE_USER_PLUGIN, HostAdapter, HostRegistration
 
 CURSOR_ADAPTER = HostAdapter(
     host_name="cursor",
     destination_dirname=".cursor",
     header_filename="sopify.mdc",
     config_dir="~/.cursor",
-    instruction_surface=INSTRUCTION_SURFACE_PROJECT_RULES,
-    instruction_file_relpath=".cursor/rules/sopify.mdc",
-    instruction_source_relpath="cursor-rules.mdc.template",
+    instruction_surface=INSTRUCTION_SURFACE_USER_PLUGIN,
+    instruction_file_relpath=".cursor/plugins/local/sopify/rules/sopify.mdc",
+    instruction_source_relpath="cursor-plugin-rule.mdc.template",
     default_language="en-US",
     skills_cli_agent=None,
     skill_install_dirname=".cursor/skills",
@@ -37,7 +37,7 @@ CURSOR_CAPABILITY = HostCapability(
         EntryMode.HOOKS,
     ),
     doctor_checks=(
-        "project_rule_present",
+        "cursor_plugin_present",
         "global_skill_tree_present",
         "payload_present",
         "cursor_hooks_present",

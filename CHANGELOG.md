@@ -6,6 +6,18 @@ Format: Summary → Changed → Plan Packages. File-level details live in `git l
 
 ## [Unreleased]
 
+### Summary
+
+Added baseline support for local Cursor IDE without per-project Sopify setup.
+
+### Changed
+
+- **Cursor host**: Added a user Plugin entry, global Skills/payload, and user Hooks; recorded observable evidence for the primary IDE workflow while keeping Agent CLI use manual and Cloud Agent out of scope.
+
+### Plan Packages
+
+- `20260819_cursor_support` → release candidate; explicit archive remains a later `~go finalize` action
+
 ## [2026-07-21] - 2026-07-21
 
 ### Summary

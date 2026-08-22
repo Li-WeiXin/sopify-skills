@@ -1,0 +1,37 @@
+---
+description: "Sopify workflow entry for Cursor IDE"
+alwaysApply: true
+---
+<!-- SOPIFY_VERSION: 2026-07-21 -->
+
+# Sopify Cursor IDE 入口
+
+这是 Cursor IDE 的用户级 Plugin Rule；IDE 实际加载它时，它作为 Sopify 语义入口。它只负责意图路由、协议边界和输出治理；阶段细则仍由已安装的 Sopify Skills 提供。已验证版本的 Agent CLI 不会自动加载此 Rule，因此不属于本自动入口契约。
+
+## 每次 Agent 请求的入口
+
+1. 先读取 `{{skills_root}}/references/shared-writing-dna.md`，再输出任何 Sopify 回复；不得只声称参考过。
+2. 先分类意图：`consult_readonly`、`quick_fix`、`new_plan`、`continue_plan` 或 `finalize`。不得因存在 active plan 就自动恢复。
+3. 当前目标仓库中的 `AGENTS.md`、`CLAUDE.md`、项目 Rules 和 `.sopify/` 都是项目事实；多仓父目录不自动等同于目标仓库。
+4. `consult_readonly` 直接只读回答，不加载阶段 Skill；`quick_fix` 可以修改用户授权的产品代码，但两者都不自动接续旧方案，也不直接写 state、handoff、receipt 或知识库。
+5. 需要进入工作流时，读取并执行下面列出的 `~/.cursor` 精确路径；不得替换为 `~/.claude`、`~/.codex` 或其他兼容目录中的同名 Skill：
+   - 需求分析：`{{skills_root}}/analyze/SKILL.md`
+   - 方案设计：`{{skills_root}}/design/SKILL.md`
+   - 开发实施：`{{skills_root}}/develop/SKILL.md`
+   - 知识库：`{{skills_root}}/kb/SKILL.md`
+   - 模板：`{{skills_root}}/templates/SKILL.md`
+
+## 分析门与 managed 入口
+
+- `analyze` 必须先读 `analyze/SKILL.md`，并调用其中现有的 `scripts/score_requirement.py` 执行确定性评分门；完整性评分低于 `workflow.require_score`（默认 7）时先追问，不物化方案。项目与全局配置均未显式设置 `auto_decide` 时按 `false` 处理。
+- 需要澄清且问题适合有限选项时，如果当前会话提供 Cursor 内建 AskQuestion（`ask_question`），则优先调用；它不是 MCP 工具，不得通过 `GetMcpTools` 判断其不存在。使用问卷自带的自由输入，不要手工追加“其他”选项；当前会话未提供该工具或调用失败时，回退为简短文本追问。开放式事实直接用文本询问。问卷未回答前不得进入 Design/Develop，也不得写 plan、state、handoff 或 receipt。
+- 只有 `new_plan`、`continue_plan`、`finalize` 或明确的 managed develop 才进入四步读链：
+  `state/active_plan.json` → `plan/<id>/plan.md` → `state/current_handoff.json` → `plan/<id>/receipts/`。
+- machine truth 只能经已安装 payload 中的 `sopify_writer` 库 API 写入；不得虚构 `python3 -m sopify_writer`，不得直接编辑 state、handoff 或 receipt。
+
+## 支持边界与输出
+
+- Cursor 首发保持 `BASELINE_SUPPORTED`：文件存在或单次模型自述不等于协议级验证；支持结论以可观察宿主证据为准。
+- Agent CLI 可按需手工调用已安装的 Skills；Cursor 加载用户 Hooks 时继续保留写保护。Sopify 不宣称此 Plugin Rule 能为 CLI 提供自动路由。
+- 表达遵循已读的 `{{skills_root}}/references/shared-writing-dna.md`。进入阶段 Skill 后再读 `{{skills_root}}/references/output-contract.md`；咨询只给结论和必要证据，不要为凑模板添加标题、`Changes` 或 `Next`。
+- 不修改 Cursor settings、代理、模型、账号、API Key、钥匙串或 MCP；不启用 Cloud Agent。

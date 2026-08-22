@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable
 
-PROJECT_RULE = Path(".cursor") / "rules" / "sopify.mdc"
 PROTECTED_STATE_FILES = frozenset(
     {
         ".sopify/state/active_plan.json",
@@ -42,6 +41,14 @@ CONTENT_KEYS = frozenset(
 SHELL_OUTPUT_REDIRECT_RE = re.compile(r"(?<![<>=])>{1,2}(?![=>])")
 SHELL_WRITE_HINTS = ("tee ", "sed -i", "rm ", "rm\t", "mv ", "cp ")
 WRITER_ALLOW_MARKERS = ("sopify_writer", "ProtocolStore")
+PLAN_FILES_BY_LEVEL = {
+    "light": ("plan.md",),
+    "standard": ("plan.md", "tasks.md"),
+    "architecture": ("plan.md", "tasks.md", "design.md"),
+}
+SEMANTIC_PLAN_FILES = frozenset({"plan.md", "tasks.md", "design.md", "background.md"})
+PLAN_ID_RE = re.compile(r"^[A-Za-z0-9_]+$")
+PLAN_LEVEL_RE = re.compile(r"^level\s*:\s*(.+?)\s*$")
 NON_RESUME_CLAUSE = (
     "这是状态事实，不是恢复命令；先按本轮用户意图分类。"
     "consult_readonly 和 quick_fix 不自动接续 active plan。"
@@ -64,18 +71,18 @@ def main() -> int:
 
 def handle(payload: dict[str, Any]) -> dict[str, Any]:
     event = str(payload.get("hook_event_name") or "")
-    workspaces = _find_enabled_workspaces(payload)
-    if not workspaces:
-        return _noop(event)
     if event == "sessionStart":
+        workspaces = _find_session_managed_roots(payload)
+        if not workspaces:
+            return {}
         workspace = _select_session_workspace(payload, workspaces)
         if workspace is None:
             return _ambiguous_session_start(len(workspaces))
         return _session_start(workspace)
     if event == "preToolUse":
-        return _pre_tool_use(payload, workspaces)
+        return _pre_tool_use(payload)
     if event == "beforeShellExecution":
-        return _before_shell(payload, workspaces)
+        return _before_shell(payload)
     return _noop(event)
 
 
@@ -85,7 +92,7 @@ def _noop(event: str) -> dict[str, Any]:
     return {}
 
 
-def _find_enabled_workspaces(payload: dict[str, Any]) -> list[Path]:
+def _find_session_managed_roots(payload: dict[str, Any]) -> list[Path]:
     candidates: list[Path] = []
     for raw in payload.get("workspace_roots") or ():
         if raw:
@@ -94,41 +101,48 @@ def _find_enabled_workspaces(payload: dict[str, Any]) -> list[Path]:
     if not cwd and isinstance(payload.get("tool_input"), dict):
         cwd = payload["tool_input"].get("working_directory") or payload["tool_input"].get("cwd")
     if cwd:
-        current = Path(str(cwd))
-        for _ in range(16):
-            candidates.append(current)
-            if current.parent == current:
-                break
-            current = current.parent
+        candidates.append(Path(str(cwd)))
     seen: set[Path] = set()
-    enabled: list[Path] = []
+    managed: list[Path] = []
     for candidate in candidates:
-        try:
-            root = candidate.expanduser().resolve()
-        except OSError:
-            continue
-        if root in seen:
+        root = _nearest_managed_root(candidate)
+        if root is None or root in seen:
             continue
         seen.add(root)
-        if (root / PROJECT_RULE).is_file():
-            enabled.append(root)
-    return enabled
+        managed.append(root)
+    return managed
+
+
+def _nearest_managed_root(path: Path) -> Path | None:
+    try:
+        current = path.expanduser().resolve()
+    except OSError:
+        return None
+    while True:
+        if (current / ".sopify").is_dir():
+            return current
+        if current.parent == current:
+            return None
+        current = current.parent
 
 
 def _session_start(workspace: Path) -> dict[str, Any]:
     active = _read_json(workspace / ".sopify" / "state" / "active_plan.json")
     handoff = _read_json(workspace / ".sopify" / "state" / "current_handoff.json")
-    plan_id = str((active or {}).get("plan_id") or "") or "(none)"
-    handoff_matches = plan_id != "(none)" and str((handoff or {}).get("plan_id") or "") == plan_id
+    plan_id = str((active or {}).get("plan_id") or "")
+    if not PLAN_ID_RE.fullmatch(plan_id):
+        return {}
+    plan_dir = workspace / ".sopify" / "plan" / plan_id
+    if not _plan_package_is_valid(plan_dir):
+        return {}
+    handoff_matches = str((handoff or {}).get("plan_id") or "") == plan_id
     handoff_action = ((handoff or {}).get("required_host_action") if handoff_matches else None) or "(none)"
-    plan_dir = workspace / ".sopify" / "plan" / plan_id if plan_id != "(none)" else None
-    plan_valid = bool(plan_dir and (plan_dir / "plan.md").is_file())
-    latest_receipt = _latest_receipt_id(plan_dir) if plan_dir is not None else None
+    latest_receipt = _latest_receipt_id(plan_dir)
     lines = [
         "Sopify status facts (not a resume order).",
         NON_RESUME_CLAUSE,
         f"active_plan: {plan_id}",
-        f"plan_present: {str(plan_valid).lower()}",
+        "plan_present: true",
         f"handoff_action: {handoff_action}",
         f"latest_receipt: {latest_receipt or '(none)'}",
     ]
@@ -159,48 +173,58 @@ def _ambiguous_session_start(workspace_count: int) -> dict[str, Any]:
     }
 
 
-def _pre_tool_use(payload: dict[str, Any], workspaces: list[Path]) -> dict[str, Any]:
+def _pre_tool_use(payload: dict[str, Any]) -> dict[str, Any]:
     tool_name = str(payload.get("tool_name") or "")
     if tool_name.casefold() not in MUTATING_FILE_TOOLS:
         return {"permission": "allow"}
     for path in _extract_paths(payload.get("tool_input")):
-        for workspace in _workspaces_for_path(path, payload, workspaces):
-            if _is_protected_path(path, workspace):
-                return _deny(path)
+        target = _resolve_tool_path(path, payload)
+        if target is None:
+            continue
+        workspace = _nearest_managed_root(target)
+        if workspace is not None and _is_protected_path(str(target), workspace):
+            return _deny(path)
     return {"permission": "allow"}
 
 
-def _before_shell(payload: dict[str, Any], workspaces: list[Path]) -> dict[str, Any]:
+def _before_shell(payload: dict[str, Any]) -> dict[str, Any]:
+    cwd = _event_cwd(payload)
+    workspace = _nearest_managed_root(Path(cwd)) if cwd else None
+    if workspace is None:
+        return {"permission": "allow"}
     command = str(payload.get("command") or "")
     has_write_hint = bool(SHELL_OUTPUT_REDIRECT_RE.search(command)) or any(
         hint in command for hint in SHELL_WRITE_HINTS
     )
-    if has_write_hint and any(
-        _command_mentions_protected_path(command, workspace) for workspace in workspaces
-    ):
+    if has_write_hint and _command_mentions_protected_path(command, workspace):
         return _deny("protected Sopify machine-truth path")
     if any(marker in command for marker in WRITER_ALLOW_MARKERS):
         return {"permission": "allow"}
     return {"permission": "allow"}
 
 
-def _workspaces_for_path(path: str, payload: dict[str, Any], workspaces: list[Path]) -> list[Path]:
+def _resolve_tool_path(path: str, payload: dict[str, Any]) -> Path | None:
     raw = Path(path.strip()).expanduser()
+    cwd = _event_cwd(payload)
+    try:
+        if raw.is_absolute():
+            return raw.resolve()
+        elif cwd:
+            return (Path(cwd).expanduser() / raw).resolve()
+        else:
+            roots = _find_session_managed_roots(payload)
+            if len(roots) == 1:
+                return (roots[0] / raw).resolve()
+    except OSError:
+        return None
+    return None
+
+
+def _event_cwd(payload: dict[str, Any]) -> str:
     cwd = payload.get("cwd")
     if not cwd and isinstance(payload.get("tool_input"), dict):
         cwd = payload["tool_input"].get("working_directory") or payload["tool_input"].get("cwd")
-    try:
-        if raw.is_absolute():
-            candidate = raw.resolve()
-        elif cwd:
-            candidate = (Path(str(cwd)).expanduser() / raw).resolve()
-        elif len(workspaces) == 1:
-            candidate = (workspaces[0] / raw).resolve()
-        else:
-            return list(workspaces)
-    except OSError:
-        return list(workspaces)
-    return [workspace for workspace in workspaces if _path_is_within(candidate, workspace)]
+    return str(cwd or "")
 
 
 def _path_is_within(path: Path, root: Path) -> bool:
@@ -282,6 +306,32 @@ def _normalize_relpath(path: str, workspace: Path) -> str:
         if raw.startswith("./"):
             raw = raw[2:]
         return raw.lstrip("/")
+
+
+def _plan_package_is_valid(plan_dir: Path) -> bool:
+    plan_md = plan_dir / "plan.md"
+    if not plan_md.is_file():
+        return False
+    try:
+        lines = plan_md.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError):
+        return False
+    if not lines or lines[0].strip() != "---":
+        return False
+    levels: list[str] = []
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        match = PLAN_LEVEL_RE.match(line)
+        if match:
+            levels.append(match.group(1).strip().strip("'\""))
+    else:
+        return False
+    if len(levels) != 1 or levels[0] not in PLAN_FILES_BY_LEVEL:
+        return False
+    expected = set(PLAN_FILES_BY_LEVEL[levels[0]])
+    present = {name for name in SEMANTIC_PLAN_FILES if (plan_dir / name).is_file()}
+    return present == expected
 
 
 def _latest_receipt_id(plan_dir: Path) -> str | None:

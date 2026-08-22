@@ -72,8 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "For Copilot: bootstrap this workspace now (defaults to current directory). "
-            "For Cursor: write the project rule into this workspace (defaults to current directory); "
-            "this does not create `.sopify`. "
+            "For Cursor: optional context only; the user Plugin install does not modify this workspace. "
             "For Codex / Claude / Qoder: advanced prewarm path. Most of those users should omit this."
         ),
     )
@@ -183,7 +182,7 @@ def run_install(
 
     workspace_bootstrap: BootstrapResult | None = None
     bundle_root: Path | None = None
-    if workspace_root is not None and not adapter.is_project_rules_scope:
+    if workspace_root is not None and not adapter.is_user_plugin_scope:
         workspace_bootstrap = run_workspace_bootstrap(payload_install.root, workspace_root)
         bundle_root = workspace_bootstrap.bundle_root
         validate_workspace_stub_manifest(workspace_root / ".sopify")

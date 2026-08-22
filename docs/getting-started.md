@@ -139,28 +139,46 @@ Copilot reads project-level instruction files across its supported surfaces
 Full trigger wiring (equivalent to Codex/Claude `~go`) is coming in a future
 release.
 
-### Cursor IDE / Cursor Agent CLI
+### Cursor IDE (optional Agent CLI)
 
-Cursor uses a split installation: a project rule in `.cursor/rules/sopify.mdc`,
-a global Skill/payload tree under `~/.cursor/`, and user-level hooks in
-`~/.cursor/hooks.json`. Run the installer from the target project:
+Cursor IDE uses one user-level Plugin rule. The same installation provides a
+global Skill/payload tree under `~/.cursor/` and user-level hooks in
+`~/.cursor/hooks.json`:
 
 ```bash
-python3 scripts/install_sopify.py --target cursor --workspace .
+python3 scripts/install_sopify.py --target cursor
 ```
 
-`--workspace` writes the project rule only; it does not create `.sopify`.
-`--with-evidentloop` is not supported for Cursor in this release. The rule is
-valid Cursor `.mdc` with `alwaysApply: true` and a portable Skill path
-`~/.cursor/skills/sopify`. Cursor discovers the same rule surface in its IDE
-and Agent CLI, but discovery is not execution proof. See
-[Cursor host acceptance](./cursor-host.md) for hook boundaries and the
-separate IDE/CLI black-box checks. The current tier remains
+After the first install or any local Plugin update, restart Cursor or run
+`Developer: Reload Window` before checking the Plugin and its Rule.
+
+`--workspace` is not required and no project Rule or `.sopify` state is
+created during install. `--with-evidentloop` is not supported for Cursor in
+this release. The Plugin Rule uses valid `.mdc` frontmatter with
+`alwaysApply: true` and routes to `~/.cursor/skills/sopify`.
+
+The validated Agent CLI version does not automatically load this user Plugin
+Rule. CLI users can invoke an installed Skill manually, for example
+`/analyze`, `/design`, or `/develop`; user Hooks remain a separate
+application-layer guard where Cursor loads them. This intentional boundary
+avoids a launcher, project Rule, prompt injector, or runtime. See
+[Cursor host acceptance](./cursor-host.md). The current tier remains
 `BASELINE_SUPPORTED`.
 
 ## Verify Setup
 
-After bootstrap, check the workspace marker:
+Cursor installs at user scope and intentionally does not create a workspace
+marker. From the Sopify checkout, verify its install surface with:
+
+```bash
+python3 scripts/sopify_doctor.py --format json --home-root "$HOME"
+```
+
+After reloading Cursor, also confirm that Customize > Rules lists `sopify` as
+Always. These checks prove installation and Rule registration, not model
+behavior.
+
+For a separately bootstrapped workspace, check its marker with:
 
 ```bash
 cat .sopify/sopify.json
