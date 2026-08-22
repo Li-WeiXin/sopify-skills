@@ -146,7 +146,7 @@ global Skill/payload tree under `~/.cursor/` and user-level hooks in
 `~/.cursor/hooks.json`:
 
 ```bash
-python3 scripts/install_sopify.py --target cursor
+curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:en-US
 ```
 
 After the first install or any local Plugin update, restart Cursor or run
@@ -157,11 +157,9 @@ created during install. `--with-evidentloop` is not supported for Cursor in
 this release. The Plugin Rule uses valid `.mdc` frontmatter with
 `alwaysApply: true` and routes to `~/.cursor/skills/sopify`.
 
-The validated Agent CLI version does not automatically load this user Plugin
-Rule. CLI users can invoke an installed Skill manually, for example
-`/analyze`, `/design`, or `/develop`; user Hooks remain a separate
-application-layer guard where Cursor loads them. This intentional boundary
-avoids a launcher, project Rule, prompt injector, or runtime. See
+The tested Agent CLI does not automatically load this user Plugin Rule.
+Automatic entry for Agent CLI and Cloud Agent is outside this release. No
+launcher, project Rule, prompt injector, or runtime is added. See
 [Cursor host acceptance](./cursor-host.md). The current tier remains
 `BASELINE_SUPPORTED`.
 

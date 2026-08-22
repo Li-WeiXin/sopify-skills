@@ -1,0 +1,33 @@
+{
+  "evidence": {
+    "behavior_boundary": "IDE and CLI behavior checks remain separate from file installation checks",
+    "committed": false,
+    "full_tests": "311 passed, 78 subtests passed",
+    "git_diff_check": "passed",
+    "isolated_cursor_install": "Plugin, Rule, Skills, payload and Hooks passed Doctor",
+    "merged": false,
+    "pages_content": "Cursor appears in both language host lists, install support text and FAQ",
+    "pages_visual_check": "desktop home and Chinese mobile layouts rendered with existing styles",
+    "pushed": false,
+    "python_syntax": "54 files parsed",
+    "release_sync_replay": "four source templates updated to one version",
+    "released": false,
+    "scope": "Cursor release candidate including GitHub Pages",
+    "shell_syntax": "passed",
+    "static_page_tests": "20 passed",
+    "support_tier": "BASELINE_SUPPORTED",
+    "svg_xml": "passed",
+    "targeted_release_tests": "33 passed",
+    "version_consistency": "passed"
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260819_cursor_support",
+    "plan_version": "sha256:2df4073325e3cf657226230f58b37479028d74375becc9a4d625ec5d34c4fb53",
+    "receipt_id": "verify_007",
+    "reviewer": "codex_release_candidate",
+    "source": "final_worktree_commands_file_review_and_local_browser_render"
+  },
+  "timestamp": "2026-08-22T05:46:06+00:00",
+  "verdict": "release_candidate_passed"
+}

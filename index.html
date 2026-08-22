@@ -64,7 +64,7 @@
             <a class="button button-primary" href="#install">Install Sopify <span aria-hidden="true">↓</span></a>
             <a class="button button-secondary" href="https://github.com/evidentloop/sopify">View on GitHub</a>
           </div>
-          <p class="hero-note">No new editor. No new CLI. Start with <code>~go</code> in the host you already use.</p>
+          <p class="hero-note">No new editor. No new CLI. Install into the host you already use and follow its documented entry.</p>
         </div>
 
         <figure class="hero-visual">
@@ -155,8 +155,8 @@
               preserves plans, decisions, and verification evidence as project files in <code>.sopify/</code>.
             </p>
             <p>
-              Ask to continue or run <code>~go</code> in a supported host to resume an unfinished plan. A local handoff pointer
-              provides a same-workspace resume hint.
+              Ask to continue or use the managed entry supported by the current host to resume an unfinished plan. A
+              local handoff pointer provides a same-workspace resume hint.
             </p>
             <span class="repo-path">.sopify/plan/…</span>
             <ul class="host-list" aria-label="Supported AI coding hosts">
@@ -164,6 +164,7 @@
               <li>Claude · verified</li>
               <li>Qoder · verified</li>
               <li class="baseline">Copilot · baseline</li>
+              <li class="baseline">Cursor · baseline</li>
             </ul>
           </div>
           <a
@@ -206,9 +207,9 @@
           </div>
 
           <aside class="install-note">
-            <h3>Then run <code>~go</code></h3>
+            <h3>Choose a host, then start</h3>
             <ul>
-              <li>Codex, Claude, Qoder, and Copilot targets</li>
+              <li>Codex, Claude, Qoder, Copilot, and Cursor targets</li>
               <li>English and Simplified Chinese instructions</li>
               <li>macOS, Linux, and Windows setup paths</li>
             </ul>
@@ -243,7 +244,7 @@
           </details>
           <details>
             <summary>Does every question start a plan?</summary>
-            <p>No. Ordinary questions and small fixes are handled directly. Sopify resumes an unfinished plan only when you ask to continue or use <code>~go</code>.</p>
+            <p>No. Ordinary questions and small fixes are handled directly. Sopify resumes an unfinished plan only when you ask to continue or use the current host's managed entry.</p>
           </details>
           <details>
             <summary>What actually travels with the repo?</summary>
@@ -251,7 +252,7 @@
           </details>
           <details>
             <summary>Does switching hosts give every host identical capabilities?</summary>
-            <p>Codex, Claude, and Qoder have protocol-verified paths. Copilot currently has baseline prompt support; its payload path is more limited.</p>
+            <p>Codex, Claude, and Qoder have protocol-verified paths. Copilot and Cursor are baseline-supported. Cursor's automatic Plugin Rule entry applies to the local IDE, not Agent CLI or Cloud Agent.</p>
           </details>
           <details>
             <summary>Is EvidentLoop required?</summary>

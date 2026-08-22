@@ -55,11 +55,13 @@ bash scripts/check-version-consistency.sh
 version-2026--03--26.103000-orange.svg
 ```
 
-**两个源模板顶部注释**：
+**四个发布版本源文件顶部注释**：
 
 ```
 skills/zh/header.md.template  →  <!-- SOPIFY_VERSION: 2026-03-26.103000 -->
 skills/en/header.md.template
+skills/zh/cursor-plugin-rule.mdc.template
+skills/en/cursor-plugin-rule.mdc.template
 ```
 
 更新后验证：
@@ -74,7 +76,8 @@ bash scripts/check-version-consistency.sh
 ```bash
 TAG="2026-03-26.103000"
 git add CHANGELOG.md README.md README.zh-CN.md \
-  skills/zh/header.md.template skills/en/header.md.template
+  skills/zh/header.md.template skills/en/header.md.template \
+  skills/zh/cursor-plugin-rule.mdc.template skills/en/cursor-plugin-rule.mdc.template
 git commit -m "release: $TAG"
 git push
 ```
@@ -120,6 +123,10 @@ grep "SourceChannel\|SourceRef" "$OUT_DIR/install.ps1"
 # 快速验证（推荐）
 HOME="$(mktemp -d)" bash -c \
   'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target codex:zh-CN'
+
+# 本次 release 包含 Cursor 变更时，再验证 Cursor
+HOME="$(mktemp -d)" bash -c \
+  'curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:zh-CN'
 ```
 
 或用 smoke 脚本：

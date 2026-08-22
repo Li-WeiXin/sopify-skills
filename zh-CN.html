@@ -63,7 +63,7 @@
             <a class="button button-primary" href="#install">安装 Sopify <span aria-hidden="true">↓</span></a>
             <a class="button button-secondary" href="https://github.com/evidentloop/sopify">查看 GitHub</a>
           </div>
-          <p class="hero-note">不用换编辑器，也不用多装一个 CLI。在现有宿主中输入 <code>~go</code> 即可开始。</p>
+          <p class="hero-note">不用换编辑器，也不用多装一个 CLI。安装到现有宿主，按对应宿主入口开始。</p>
         </div>
 
         <figure class="hero-visual">
@@ -150,13 +150,14 @@
             <p class="eyebrow">产品形态</p>
             <h2><span class="keep-together">宿主负责执行，</span><wbr /><span class="keep-together">Sopify 让工作可接续</span></h2>
             <p>Sopify 是装进现有 AI 编程宿主的工作流协议层。它提供共享规则，并把方案、决策和验证证据作为项目文件保存在 <code>.sopify/</code>。</p>
-            <p>明确要求继续或输入 <code>~go</code> 后，宿主才会从这些记录接续未完成的方案；本地交接指针为同一工作区提供接续提示。</p>
+            <p>明确要求继续或使用当前宿主支持的托管入口后，宿主才会从这些记录接续未完成的方案；本地交接指针为同一工作区提供接续提示。</p>
             <span class="repo-path">.sopify/plan/…</span>
             <ul class="host-list" aria-label="支持的 AI 编程宿主">
               <li>Codex · 已验证</li>
               <li>Claude · 已验证</li>
               <li>Qoder · 已验证</li>
               <li class="baseline">Copilot · 基线支持</li>
+              <li class="baseline">Cursor · 基线支持</li>
             </ul>
           </div>
           <a
@@ -199,9 +200,9 @@
           </div>
 
           <aside class="install-note">
-            <h3>然后输入 <code>~go</code></h3>
+            <h3>选择宿主，然后开始</h3>
             <ul>
-              <li>支持 Codex、Claude、Qoder 与 Copilot</li>
+              <li>支持 Codex、Claude、Qoder、Copilot 与 Cursor</li>
               <li>提供中文和英文指令</li>
               <li>包含 macOS、Linux 与 Windows 安装路径</li>
             </ul>
@@ -236,7 +237,7 @@
           </details>
           <details>
             <summary>普通问题也会自动进入方案吗？</summary>
-            <p>不会。普通问答和小范围修改直接处理；只有你明确说“继续”或使用 <code>~go</code> 时，才恢复未完成的方案。</p>
+            <p>不会。普通问答和小范围修改直接处理；只有你明确说“继续”或使用当前宿主的托管入口时，才恢复未完成的方案。</p>
           </details>
           <details>
             <summary>真正跟着项目走的是什么？</summary>
@@ -244,7 +245,7 @@
           </details>
           <details>
             <summary>换宿主后能力完全一样吗？</summary>
-            <p>Codex、Claude 和 Qoder 已通过协议路径验证。Copilot 当前是 prompt 基线支持，payload 路径仍有限。</p>
+            <p>Codex、Claude 和 Qoder 已通过协议路径验证。Copilot 和 Cursor 为基线支持；Cursor 的 Plugin Rule 自动入口只适用于本地 IDE，不覆盖 Agent CLI 或 Cloud Agent。</p>
           </details>
           <details>
             <summary>必须安装 EvidentLoop 吗？</summary>

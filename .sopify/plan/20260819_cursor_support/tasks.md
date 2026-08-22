@@ -65,3 +65,13 @@
   - 最终复审返回 `accept`，P0/P1 无。其三个 P2 已以真实安装与候选对齐、AskQuestion 口径降级和 UI/文件证据分层关闭；后续独立审计的两处术语修正由 `verify_005` 绑定最终方案版本。
 - [x] 5.5 保持 `BASELINE_SUPPORTED`，清楚记录自动化、CLI、IDE 各自证据与缺口。
   - 独立 sessionStart、显式 finalize、AskQuestion 跨模型稳定性、CLI 自动 Plugin Rule 与 Cloud Agent 均记录为未验证或不支持边界，不阻塞本次 baseline 收口。
+
+## 6. Release 收口修正
+
+- [x] 6.1 将双语 Cursor Plugin Rule 的 `SOPIFY_VERSION` 纳入现有 release-sync、版本一致性检查和 pre-commit 回滚/暂存，不新增版本机制。
+- [x] 6.2 将 Cursor 用户文档与宿主矩阵改为显式语言 target，并提供 stable release 一键安装命令。
+- [x] 6.3 运行定向与全量回归，并追加新的 verify receipt，确认当前提交可以进入合并与发布步骤。
+  - 结果：定向测试 33 passed；全量测试 311 passed / 78 subtests；Python 语法、Shell 语法、SVG XML 与 `git diff --check` 均通过。
+  - 安装检查：隔离 home 中的 Cursor Plugin、Rule、Skills、payload 和 Hooks 均通过 Doctor；IDE/CLI 行为项仍保持未认证，不从文件安装结果外推。
+- [x] 6.4 同步 GitHub Pages 的中英文宿主列表、安装支持范围和 FAQ；复用现有标签与响应式布局，不新增页面结构或样式机制。
+  - 结果：双语内容测试 20 passed；桌面首页与中文移动端完成本地浏览器渲染检查，Cursor 标签沿用现有 baseline 样式。

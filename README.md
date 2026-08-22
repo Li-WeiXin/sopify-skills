@@ -138,7 +138,7 @@ Host support:
 | Claude | PROTOCOL_VERIFIED | `claude:en-US` / `claude:zh-CN` | Full capability continuation |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | Validated on Qoder CLI |
 | Copilot | BASELINE_SUPPORTED | `copilot:en-US` / `copilot:zh-CN` | Prompt-only; payload uplift planned |
-| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor` | IDE user Plugin + global Skills/payload + user hooks; observable IDE baseline evidence, CLI uses Skills manually |
+| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor:en-US` / `cursor:zh-CN` | IDE user Plugin + global Skills/payload + user hooks |
 
 Pass `--workspace <path>` to target another repo for workspace-scope or prewarm installs; Cursor installs once at user scope and does not require it. Use `--language <lang>` to control output language.
 

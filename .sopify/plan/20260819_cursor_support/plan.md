@@ -78,7 +78,7 @@ Cursor 官方允许用户范围安装 Cursor Plugin，Plugin 可包含 `rules/*.
 - 不修改 Cursor `settings.json`、代理、模型、账号、API Key、钥匙串或 MCP 配置；现有 `127.0.0.1:7898` 环境不受影响。
 - 不把文件存在、Customize 列表、Rule 为 Always、Skill discovery 或模型自述当成行为通过。
 - 不覆盖已有 `exec_001`、`exec_002`、`verify_001`、`verify_002`、`verify_003` 或独立审计；新实施和验证追加新 receipt。
-- 本轮只完成本地 feature commit；push、release 与显式 finalize 仍需用户另行授权。
+- 显式 finalize 不在本轮范围。合并与 release 只在用户明确授权后执行。
 
 ## Status / Progress
 
@@ -104,7 +104,8 @@ Cursor 官方允许用户范围安装 Cursor Plugin，Plugin 可包含 `rules/*.
 - [x] README 宿主 badge、架构图与中英文产品形态 SVG 已同步 Cursor；仅修改全量宿主矩阵，封面、demo 与跨宿主场景图保持具体示例，不为凑齐宿主重绘。
 - [x] 独立视觉/文档复审最终返回 `accept`，P0/P1/P2 均无；其发现的 Cursor 验证断点、badge 导航和顶部跨宿主口径已做最小修正，未新增入口或机制。
 - [x] 最终候选回归通过：308 passed / 78 subtests，Python compileall、`bash -n install.sh`、SVG XML、视觉渲染与 `git diff --check` 均通过；真实 `cursor:zh-CN` 安装与候选逐字对齐，受保护配置及系统代理前后不变。
+- [x] Release 收口检查通过：Cursor 双语 Rule 已纳入版本同步、版本一致性检查和 pre-commit 回滚；README、宿主文档与 GitHub Pages 的双语数据已对齐。定向测试 33 passed，全量测试 311 passed / 78 subtests，隔离 Cursor 安装通过 Doctor。安装结果不替代 IDE/CLI 行为认证。
 
 ## Next
 
-本方案保持 `ready_to_archive`；显式归档留给后续 `~go finalize`。本轮不 push、不 release。
+本方案保持 `ready_to_archive`；按用户授权合并 PR、发布 latest release 并验证稳定安装包。显式归档留给后续 `~go finalize`。

@@ -1,11 +1,11 @@
 # Cursor 宿主接入
 
-主要目标是本地 Cursor IDE；Cursor Agent CLI 作为低频、手工 Skill 兼容面，不覆盖 Cloud Agent。支持档位保持 `BASELINE_SUPPORTED`。真实 IDE 已观察到 Plugin Rule 路由、Analyze 评分、AskQuestion 调用尝试与文本回退、managed develop、writer 写回和 Hook 拒绝明显直写；这些 baseline 证据不外推为跨模型稳定性或完整协议认证。真实 CLI 已证明用户 Plugin Rule 不会自动成为 CLI 入口，本期明确不为此增加 launcher、项目 Rule 或 runtime。
+主要支持本地 Cursor IDE。Cursor Agent CLI 不提供自动 Plugin Rule 入口，Cloud Agent 不在本期范围。支持档位保持 `BASELINE_SUPPORTED`。真实 IDE 已观察到 Plugin Rule 路由、Analyze 评分、AskQuestion 调用尝试与文本回退、managed develop、writer 写回和 Hook 拒绝明显直写；这些证据不代表跨模型稳定性或完整协议认证。本期不为 CLI 增加 launcher、项目 Rule 或 runtime。
 
 ## 安装面
 
 ```bash
-python3 scripts/install_sopify.py --target cursor
+curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:zh-CN
 ```
 
 首次安装或更新本地 Plugin 后，重启 Cursor，或执行 `Developer: Reload Window`，再检查 Plugin 与 Rule。Cursor 官方将 reload/restart 作为 `~/.cursor/plugins/local` 本地测试流程的一部分。
@@ -60,9 +60,9 @@ IDE 与 CLI 分开记录，不互相外推：
 
 1. IDE baseline 已有可观察证据：已安装 Rule 含 `alwaysApply: true`，consult 实际读取 Cursor 写作规范并保持只读；Analyze 读取 Cursor Skill 并执行评分脚本；有限选项澄清留下 AskQuestion tool use 与 `Tool not found` 文本回退，结构化问卷 UI 仅作为人工观察，transcript 不含 tool result 或选项回传；managed 场景按 Analyze → Design → Develop 推进，经 `sopify_writer` 写 state、handoff 与 receipts；明显 Shell 直写 machine truth 被 Hook 拒绝且文件哈希不变。
 2. IDE 未验证边界：AskQuestion 是否跨模型稳定提供、独立 `sessionStart` 行为与显式 finalize。本期依赖文本追问回退和现有协议边界，不把这些项目作为 baseline 发布阻塞。
-3. CLI（可选兼容验收）：手工调用 `/analyze`、`/design` 或 `/develop`，确认实际读取 `~/.cursor/skills/sopify` 中的目标 Skill；若验证 Hooks，保留工具调用、拒绝结果与文件哈希。不得从手工 Skill 或 Hook 通过外推自动语义入口。
+3. CLI 未验证自动语义入口。CLI 的结果不能用于证明 IDE 行为，IDE 的结果也不能用于证明 CLI 行为。
 
-Cursor 官方 CLI 文档明确项目 Rules，但没有把用户 Plugin Rule 写成 CLI 加载契约。2026-08-20 的真实会话也未读取 Cursor Plugin Rule 指定的共享规范，显式 `--plugin-dir` 唯一标记探针同样未生效。因此 CLI 自动入口明确不支持，不是本期发布阻塞项；CLI 低频使用时走手工 Skill，不静默保留第二套 Rule。
+Cursor 官方 CLI 文档明确项目 Rules，但没有把用户 Plugin Rule 写成 CLI 加载契约。2026-08-20 的真实会话也未读取 Cursor Plugin Rule 指定的共享规范，显式 `--plugin-dir` 唯一标记探针同样未生效。因此 CLI 自动入口明确不支持，也不阻塞本次 IDE baseline 发布。
 
 一次临时仓库黑盒已观察到四步读链、managed develop 与 `sopify_writer` 写回；显式 finalize 仍按用户命令触发，未纳入本次 baseline 黑盒。Doctor 的行为项继续保持静态 `BLACK_BOX_NOT_VERIFIED`，不把某台机器上的临时 transcript 写成可移植产品认证。
 
