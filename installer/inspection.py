@@ -840,8 +840,8 @@ def _cursor_behavior_check(*, capability: HostCapability, check_id: str) -> Insp
         )
     else:
         recommendation = (
-            "Optionally run the Cursor Agent CLI manual-Skill and Hook black-box flow. "
-            "Automatic loading of the user Plugin Rule is not a supported CLI entry."
+            "Run the Cursor Agent CLI managed-entry and Hook black-box flow. "
+            "Top-level Skill selection is best-effort and remains separate from file installation evidence."
         )
     return _cursor_not_verified_check(
         capability=capability,

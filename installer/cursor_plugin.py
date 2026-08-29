@@ -11,6 +11,7 @@ from installer.models import InstallError, InstallPhaseResult
 
 _IGNORE_PATTERNS = shutil.ignore_patterns(".DS_Store", "Thumbs.db", "__pycache__")
 _README_TEMPLATE_NAME = "cursor-plugin-readme.md.template"
+_CLI_SKILL_TEMPLATE_NAME = "cursor-cli-skill.md.template"
 
 
 def install_cursor_user_plugin_assets(
@@ -26,11 +27,14 @@ def install_cursor_user_plugin_assets(
 
     rule_source = adapter.instruction_source(repo_root, language_directory)
     readme_source = rule_source.with_name(_README_TEMPLATE_NAME)
+    root_skill_source = rule_source.with_name(_CLI_SKILL_TEMPLATE_NAME)
     skills_source = adapter.source_root(repo_root, language_directory) / "skills" / "sopify"
     if not rule_source.is_file():
         raise InstallError(f"Missing source Cursor Plugin rule: {rule_source}")
     if not readme_source.is_file():
         raise InstallError(f"Missing source Cursor Plugin README: {readme_source}")
+    if not root_skill_source.is_file():
+        raise InstallError(f"Missing source Cursor CLI Skill: {root_skill_source}")
     if not skills_source.is_dir():
         raise InstallError(f"Missing source skills directory: {skills_source}")
 
@@ -38,9 +42,11 @@ def install_cursor_user_plugin_assets(
     readme_path = adapter.user_plugin_readme_path(home_root)
     plugin_root = rule_path.parent.parent
     skills_destination = adapter.destination_root(home_root) / "skills" / "sopify"
+    root_skill_destination = skills_destination / "SKILL.md"
     manifest = _manifest_text()
     rule = render_user_plugin_rule(rule_source, adapter)
     readme = readme_source.read_text(encoding="utf-8").rstrip("\n") + "\n"
+    root_skill = root_skill_source.read_text(encoding="utf-8").rstrip("\n") + "\n"
     expected_paths = adapter.expected_paths(home_root)
     if (
         manifest_path.is_file()
@@ -49,6 +55,8 @@ def install_cursor_user_plugin_assets(
         and rule_path.read_text(encoding="utf-8") == rule
         and readme_path.is_file()
         and readme_path.read_text(encoding="utf-8") == readme
+        and root_skill_destination.is_file()
+        and root_skill_destination.read_text(encoding="utf-8") == root_skill
         and all(path.exists() for path in adapter.global_skill_paths(home_root))
     ):
         return InstallPhaseResult(
@@ -71,6 +79,7 @@ def install_cursor_user_plugin_assets(
         shutil.rmtree(skills_destination)
     skills_destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(skills_source, skills_destination, ignore=_IGNORE_PATTERNS)
+    root_skill_destination.write_text(root_skill, encoding="utf-8")
 
     return InstallPhaseResult(
         action=action,

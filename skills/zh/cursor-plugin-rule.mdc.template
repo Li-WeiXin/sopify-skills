@@ -6,7 +6,7 @@ alwaysApply: true
 
 # Sopify Cursor IDE 入口
 
-这是 Cursor IDE 的用户级 Plugin Rule；IDE 实际加载它时，它作为 Sopify 语义入口。它只负责意图路由、协议边界和输出治理；阶段细则仍由已安装的 Sopify Skills 提供。已验证版本的 Agent CLI 不会自动加载此 Rule，因此不属于本自动入口契约。
+这是 Cursor IDE 的用户级 Plugin Rule；IDE 实际加载它时，它作为 Sopify 语义入口。它只负责意图路由、协议边界和输出治理；阶段细则仍由已安装的 Sopify Skills 提供。Agent CLI 不会自行加载 Plugin Rule；默认安装的顶层 `sopify` Skill 被模型选中后，会实际读取本 Rule 并复用同一协议。
 
 ## 每次 Agent 请求的入口
 
@@ -14,7 +14,8 @@ alwaysApply: true
 2. 先分类意图：`consult_readonly`、`quick_fix`、`new_plan`、`continue_plan` 或 `finalize`。不得因存在 active plan 就自动恢复。
 3. 当前目标仓库中的 `AGENTS.md`、`CLAUDE.md`、项目 Rules 和 `.sopify/` 都是项目事实；多仓父目录不自动等同于目标仓库。
 4. `consult_readonly` 直接只读回答，不加载阶段 Skill；`quick_fix` 可以修改用户授权的产品代码，但两者都不自动接续旧方案，也不直接写 state、handoff、receipt 或知识库。
-5. 需要进入工作流时，读取并执行下面列出的 `~/.cursor` 精确路径；不得替换为 `~/.claude`、`~/.codex` 或其他兼容目录中的同名 Skill：
+5. 如果已授权动作扩大为新的用户级或系统级持久化、删除操作，先说明新增影响并重新等待确认。
+6. 需要进入工作流时，读取并执行下面列出的 `~/.cursor` 精确路径；不得替换为 `~/.claude`、`~/.codex` 或其他兼容目录中的同名 Skill：
    - 需求分析：`{{skills_root}}/analyze/SKILL.md`
    - 方案设计：`{{skills_root}}/design/SKILL.md`
    - 开发实施：`{{skills_root}}/develop/SKILL.md`
@@ -32,6 +33,6 @@ alwaysApply: true
 ## 支持边界与输出
 
 - Cursor 首发保持 `BASELINE_SUPPORTED`：文件存在或单次模型自述不等于协议级验证；支持结论以可观察宿主证据为准。
-- Agent CLI 可按需手工调用已安装的 Skills；Cursor 加载用户 Hooks 时继续保留写保护。Sopify 不宣称此 Plugin Rule 能为 CLI 提供自动路由。
+- Agent CLI 默认安装 managed-first 顶层 Skill；模型自动选择属于 best-effort，只有实际读取顶层 Skill 与本 Rule 后才算进入 Sopify。Cursor 加载用户 Hooks 时继续保留写保护。
 - 表达遵循已读的 `{{skills_root}}/references/shared-writing-dna.md`。进入阶段 Skill 后再读 `{{skills_root}}/references/output-contract.md`；咨询只给结论和必要证据，不要为凑模板添加标题、`Changes` 或 `Next`。
 - 不修改 Cursor settings、代理、模型、账号、API Key、钥匙串或 MCP；不启用 Cloud Agent。

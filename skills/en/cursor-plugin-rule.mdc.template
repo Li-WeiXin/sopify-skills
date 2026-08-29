@@ -6,7 +6,7 @@ alwaysApply: true
 
 # Sopify Cursor IDE Entry
 
-This is the user-level Cursor Plugin rule for the IDE. When the IDE loads it, it is the Sopify semantic entry. It governs intent routing, protocol boundaries, and output; the installed Sopify Skills retain the phase procedures. The Agent CLI does not automatically load this Rule in the validated release and is outside this automatic-entry contract.
+This is the user-level Cursor Plugin rule for the IDE. When the IDE loads it, it is the Sopify semantic entry. It governs intent routing, protocol boundaries, and output; the installed Sopify Skills retain the phase procedures. Agent CLI does not load a Plugin Rule by itself; when the default top-level `sopify` Skill is selected, it reads this Rule and reuses the same protocol.
 
 ## Entry for every Agent request
 
@@ -14,7 +14,8 @@ This is the user-level Cursor Plugin rule for the IDE. When the IDE loads it, it
 2. Classify intent first: `consult_readonly`, `quick_fix`, `new_plan`, `continue_plan`, or `finalize`. Never resume merely because an active plan exists.
 3. Treat `AGENTS.md`, `CLAUDE.md`, project Rules, and `.sopify/` in the current target repository as project facts. A multi-repository parent directory is not automatically the target repository.
 4. Answer `consult_readonly` directly and read-only without loading a phase Skill. `quick_fix` may modify user-authorized product code, but neither mode resumes an old plan or directly writes state, handoff, receipts, or the knowledge base.
-5. For workflow work, read and execute the exact `~/.cursor` path listed below. Do not substitute a same-named Skill from `~/.claude`, `~/.codex`, or another compatibility directory:
+5. If an authorized action expands into new user-level or system-level persistence or deletion, explain the added impact and wait for confirmation again.
+6. For workflow work, read and execute the exact `~/.cursor` path listed below. Do not substitute a same-named Skill from `~/.claude`, `~/.codex`, or another compatibility directory:
    - Requirements analysis: `{{skills_root}}/analyze/SKILL.md`
    - Solution design: `{{skills_root}}/design/SKILL.md`
    - Development: `{{skills_root}}/develop/SKILL.md`
@@ -32,6 +33,6 @@ This is the user-level Cursor Plugin rule for the IDE. When the IDE loads it, it
 ## Support boundary and output
 
 - Cursor remains `BASELINE_SUPPORTED`: file presence or a single model claim is not protocol-level verification; support conclusions require observable host evidence.
-- Agent CLI users may invoke the installed Skills manually; user Hooks remain available where Cursor loads them. Sopify does not claim automatic CLI routing through this Plugin Rule.
+- Agent CLI installs a managed-first top-level Skill by default. Model selection is best-effort, and Sopify is entered only after the top-level Skill and this Rule were actually read. User Hooks remain available where Cursor loads them.
 - Follow the already-read `{{skills_root}}/references/shared-writing-dna.md`. After entering a phase Skill, read `{{skills_root}}/references/output-contract.md`. For consult, give only the conclusion and necessary evidence; do not add a banner, `Changes`, or `Next` to fill a template.
 - Do not modify Cursor settings, proxy, model, account, API key, keychain, or MCP. Cloud Agents are out of scope.

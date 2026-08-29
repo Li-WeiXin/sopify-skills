@@ -1,0 +1,45 @@
+{
+  "evidence": {
+    "code_quality": "passed: host-specific source, content-aware reinstall, minimal negative coverage, no new target or runtime surface",
+    "cursor_reviews": [
+      {
+        "dispatch_id": "ctx_750e36ccddfc",
+        "finding": "Cursor-only root Skill polluted the shared host tree",
+        "verdict": "not_accepted"
+      },
+      {
+        "dispatch_id": "ctx_d2cb261a215a",
+        "finding": "cross-host isolation, minimal tests, and documentation are closed",
+        "message_id": "msg_ca3e063cf5bd",
+        "verdict": "accepted"
+      }
+    ],
+    "final_architecture": {
+      "cursor_only_sources": [
+        "skills/zh/cursor-cli-skill.md.template",
+        "skills/en/cursor-cli-skill.md.template"
+      ],
+      "installed_path": "~/.cursor/skills/sopify/SKILL.md",
+      "shared_host_tree_pollution": false,
+      "single_target": "cursor:<language>",
+      "support_tier": "BASELINE_SUPPORTED"
+    },
+    "final_tests": "313 passed, 81 subtests",
+    "remaining_boundaries": [
+      "IDE and CLI behavior checks remain BLACK_BOX_NOT_VERIFIED",
+      "Cloud Agent excluded",
+      "cross-model selection not promised"
+    ],
+    "spec_compliance": "passed: managed-first, one install, local latest, stale cleanup, independent Cursor acceptance, no finalize"
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:26d94ce48ae59cb572a5f3bc67a234a99a681786a49fda072a989b18059d77a6",
+    "receipt_id": "verify_003",
+    "scope": "final Cursor CLI productization review",
+    "verifier_host": "cursor"
+  },
+  "timestamp": "2026-08-29T14:57:12+00:00",
+  "verdict": "accept_cursor_cli_one_install_productization"
+}

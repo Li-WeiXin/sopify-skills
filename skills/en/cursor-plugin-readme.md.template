@@ -1,19 +1,20 @@
 # Sopify
 
-Sopify is an adaptive workflow layer for Cursor IDE. It routes each request to the smallest appropriate path—read-only consultation, quick fix, analysis, design, or managed development—while keeping evidence and project-state boundaries explicit.
+One installation lets Sopify serve both Cursor IDE and local Agent CLI. The IDE loads the user-level Rule automatically; the CLI selects a top-level Skill for plan, development, resume, and closeout requests, then reads the same Rule.
 
 ## Use Sopify
 
-Describe the goal naturally. Sopify uses the current repository's instructions and `.sopify/` context, then loads only the relevant Skill. For explicit phase control, invoke the installed `/analyze`, `/design`, or `/develop` Skill.
+- **In the IDE**: describe the goal naturally. The Always Rule classifies intent and loads the phase Skills that are needed.
+- **In the CLI**: describe a plan, development, or resume goal directly. Ordinary questions do not have to enter Sopify; for explicit phase control, `/analyze`, `/design`, and `/develop` remain available.
 
-## How it works
+## Shared capabilities
 
-- **Always Rule** classifies intent and routes the request.
-- **Skills** provide the phase-specific procedures.
-- **User Hooks** guard protocol state and receipt files against obvious direct writes; they are not a security sandbox.
+- **Phase Skills** provide analysis, design, development, knowledge-base, and template procedures.
+- **Payload** provides the versioned protocol and `sopify_writer`.
+- **User Hooks** reject obvious direct writes to protocol state, handoff, and receipt files; they are not a security sandbox.
 
 ## Support boundary
 
-- Cursor IDE is the automatic semantic entry. Cursor Agent CLI uses the installed Skills manually.
-- Support remains `BASELINE_SUPPORTED`: the primary IDE path has observable evidence, but automatic CLI entry, Cloud Agents, and identical behavior across models are not promised.
-- Sopify does not modify Cursor settings, proxy, model, account, API keys, keychain, or MCP configuration. Cloud Agents are out of scope.
+- Support remains `BASELINE_SUPPORTED`; IDE and CLI behavior evidence stays separate.
+- The model selects the CLI entry based on the request. Identical behavior is not promised for ordinary questions, every model, or every machine.
+- Sopify does not modify Cursor settings, proxy, model, account, API keys, keychain, or MCP. Cloud Agents are out of scope.

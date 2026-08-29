@@ -1,0 +1,18 @@
+{
+  "evidence": {
+    "baseline_greeting_sha256": "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03",
+    "demo_root": "/private/tmp/sopify-cursor-cli-entry-demo-20260828",
+    "installed_skill_sha256": "bbec80a93fd1acf049e7a5539930d7c93337e60dbfb97ce356f48fd4e9ffdafd",
+    "product_source_diff": "none",
+    "repository_regression": "311 passed, 78 subtests"
+  },
+  "provenance": {
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:576bf51018ab71222cacb7e8e4d7b048afa04eb3c6ba60908be4b33a3fce4b8b",
+    "receipt_id": "exec_001",
+    "scope": "local Cursor Agent CLI entry probe",
+    "writer": "sopify_writer"
+  },
+  "timestamp": "2026-08-28T13:39:48+00:00",
+  "verdict": "local_probe_ready"
+}

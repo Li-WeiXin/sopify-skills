@@ -1,19 +1,20 @@
 # Sopify
 
-Sopify 是 Cursor IDE 的自适应工作流层。它先把请求路由到最小适用路径——只读咨询、快速修复、需求分析、方案设计或受管开发——并明确约束证据和项目状态边界。
+一次安装即可让 Sopify 同时服务于 Cursor IDE 与本地 Agent CLI。IDE 会自动加载用户级 Rule；CLI 会在方案、开发、继续和收口等请求中按需选择顶层 Skill，再读取同一 Rule。
 
 ## 使用方式
 
-直接用自然语言说明目标。Sopify 会结合当前仓库的项目指令与 `.sopify/` 上下文，只加载相关 Skill。需要明确指定阶段时，可以调用已安装的 `/analyze`、`/design` 或 `/develop` Skill。
+- **在 IDE 中**：直接用自然语言说明目标，Always Rule 会分类意图并加载需要的阶段 Skill。
+- **在 CLI 中**：直接描述方案、开发或接续目标。普通问答不强制进入 Sopify；需要明确指定阶段时，仍可调用 `/analyze`、`/design` 或 `/develop`。
 
-## 工作方式
+## 共用能力
 
-- **Always Rule**：分类意图并路由请求。
-- **Skills**：提供各阶段的执行细则。
-- **用户级 Hooks**：对协议 state、handoff 与 receipt 提供明显直写保护；它们不是安全沙箱。
+- **阶段 Skills**：提供分析、设计、开发、知识库和模板细则。
+- **Payload**：提供版本化协议与 `sopify_writer`。
+- **用户级 Hooks**：拒绝对协议 state、handoff 与 receipt 的明显直接写入；它们不是安全沙箱。
 
 ## 支持边界
 
-- Cursor IDE 是自动语义入口；Cursor Agent CLI 手工使用已安装 Skills。
-- 当前支持档位为 `BASELINE_SUPPORTED`；IDE 主路径已有可观察证据，但不承诺 CLI 自动入口、Cloud Agent 或跨模型完全一致。
-- Sopify 不修改 Cursor settings、代理、模型、账号、API Key、钥匙串或 MCP 配置；不支持 Cloud Agent。
+- 当前支持档位为 `BASELINE_SUPPORTED`；IDE 与 CLI 的行为证据分开记录。
+- CLI 入口由模型按请求选择，不保证普通问答、所有模型或所有机器表现完全一致。
+- Sopify 不修改 Cursor settings、代理、模型、账号、API Key、钥匙串或 MCP；不支持 Cloud Agent。

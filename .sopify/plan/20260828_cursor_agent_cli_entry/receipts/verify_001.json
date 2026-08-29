@@ -1,0 +1,40 @@
+{
+  "evidence": {
+    "cases": {
+      "analyze_design": "pass",
+      "consult": "pass",
+      "develop": "pass"
+    },
+    "installed_skill_sha256": "bbec80a93fd1acf049e7a5539930d7c93337e60dbfb97ce356f48fd4e9ffdafd",
+    "product_source_diff": "none",
+    "repository_regression": "311 passed, 78 subtests",
+    "transcript_sha256": {
+      "analyze_design": "26b0f7c2c1765f4714fc543c9f01cf2c2461861db97cfd9b2b44a786cdb1a293",
+      "consult": "a7eb73fa5db21e7fcd3c3ea31e86e590e684dd66093964328ab7cbe9a371e5d2",
+      "develop": "e7932475f303926bdaf88c5191f2c24396896abd05cec825aff294f238c73bec"
+    },
+    "unverified_boundaries": [
+      "Cursor IDE behavior after local root Skill install",
+      "cross-model stability",
+      "bilingual product installation"
+    ],
+    "verified_boundaries": [
+      "automatic root Skill selection in three fresh Cursor CLI sessions",
+      "consult read-only",
+      "Analyze score and Design level scripts",
+      "four-step continuation",
+      "sopify_writer state/handoff/receipts",
+      "state ignore",
+      "ready_to_archive without commit/finalize"
+    ]
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:6060df26c8bfdae38577e4020d234a36dac2f1544b86f20e6e4639503608220b",
+    "receipt_id": "verify_001",
+    "scope": "local Cursor Agent CLI entry experiment"
+  },
+  "timestamp": "2026-08-28T14:46:07+00:00",
+  "verdict": "accept_local_cli_entry"
+}

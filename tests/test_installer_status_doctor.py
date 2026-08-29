@@ -19,6 +19,7 @@ from installer.hosts.base import install_host_assets
 from installer.hosts.claude import CLAUDE_ADAPTER
 from installer.hosts.codex import CODEX_ADAPTER
 from installer.hosts.cursor import CURSOR_ADAPTER
+from installer.hosts.qoder import QODER_ADAPTER
 from installer.inspection import build_doctor_payload, build_status_payload, render_doctor_text, render_status_text
 from installer.models import InstallError
 from installer.payload import _REQUIRED_BUNDLE_CAPABILITIES, install_global_payload, run_workspace_bootstrap
@@ -133,8 +134,10 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             self.assertTrue(readme.is_file())
             manifest_payload = json.loads(manifest.read_text(encoding="utf-8"))
             self.assertNotIn("rules", manifest_payload)
-            self.assertIn("adaptive workflow layer", readme.read_text(encoding="utf-8"))
-            self.assertIn("BASELINE_SUPPORTED", readme.read_text(encoding="utf-8"))
+            readme_text = readme.read_text(encoding="utf-8")
+            self.assertIn("Cursor IDE and local Agent CLI", readme_text)
+            self.assertIn("BASELINE_SUPPORTED", readme_text)
+            self.assertTrue((skill_root / "SKILL.md").is_file())
             self.assertTrue((skill_root / "analyze" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "design" / "SKILL.md").is_file())
             self.assertTrue((skill_root / "develop" / "SKILL.md").is_file())
@@ -156,7 +159,7 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             self.assertIn("alwaysApply: true", rule.read_text(encoding="utf-8"))
             self.assertIn("~/.cursor/skills/sopify/references/shared-writing-dna.md", rule.read_text(encoding="utf-8"))
             self.assertIn("Cursor IDE", rule.read_text(encoding="utf-8"))
-            self.assertIn("does not automatically load", rule.read_text(encoding="utf-8"))
+            self.assertIn("does not load a Plugin Rule by itself", rule.read_text(encoding="utf-8"))
             self.assertNotIn(str(skill_root), rule.read_text(encoding="utf-8"))
             self.assertIsNone(result.workspace_bootstrap)
             self.assertEqual(result.target.host, "cursor")
@@ -215,6 +218,59 @@ class HostCapabilityRegistryTests(unittest.TestCase):
             )
             self.assertEqual(repair_result.host_install.action, "updated")
             self.assertTrue(readme.is_file())
+
+    def test_cursor_reinstall_replaces_stale_cli_entry_and_cleans_backup(self) -> None:
+        with tempfile.TemporaryDirectory() as home_dir:
+            home_root = Path(home_dir)
+            run_install(
+                target_value="cursor:zh-CN",
+                workspace_value=None,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+            )
+
+            skill_root = home_root / ".cursor" / "skills" / "sopify"
+            root_skill = skill_root / "SKILL.md"
+            stale_backup = skill_root / "SKILL.md.old"
+            root_skill.write_text("old local probe\n", encoding="utf-8")
+            stale_backup.write_text("stale backup\n", encoding="utf-8")
+
+            updated = run_install(
+                target_value="cursor:zh-CN",
+                workspace_value=None,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+            )
+            canonical = (
+                REPO_ROOT / "skills" / "zh" / "cursor-cli-skill.md.template"
+            ).read_text(encoding="utf-8")
+
+            self.assertEqual(updated.host_install.action, "updated")
+            self.assertEqual(root_skill.read_text(encoding="utf-8"), canonical)
+            self.assertFalse(stale_backup.exists())
+
+            repeated = run_install(
+                target_value="cursor:zh-CN",
+                workspace_value=None,
+                repo_root=REPO_ROOT,
+                home_root=home_root,
+            )
+            self.assertEqual(repeated.host_install.action, "skipped")
+
+    def test_cursor_cli_entry_is_not_installed_for_other_home_hosts(self) -> None:
+        for adapter in (CODEX_ADAPTER, CLAUDE_ADAPTER, QODER_ADAPTER):
+            with self.subTest(host=adapter.host_name), tempfile.TemporaryDirectory() as home_dir:
+                home_root = Path(home_dir)
+                install_host_assets(
+                    adapter,
+                    repo_root=REPO_ROOT,
+                    home_root=home_root,
+                    language_directory="CN",
+                )
+                cursor_only_entry = (
+                    adapter.destination_root(home_root) / "skills" / "sopify" / "SKILL.md"
+                )
+                self.assertFalse(cursor_only_entry.exists())
 
     def test_cursor_install_preflights_invalid_hooks_before_any_product_write(self) -> None:
         with tempfile.TemporaryDirectory() as home_dir, tempfile.TemporaryDirectory() as workspace_dir:

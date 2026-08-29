@@ -1,0 +1,41 @@
+{
+  "evidence": {
+    "canonical_entry_paths": [
+      "skills/zh/skills/sopify/SKILL.md",
+      "skills/en/skills/sopify/SKILL.md"
+    ],
+    "cli_config_installer_observation": "unchanged across the final product install; Cursor Agent itself updates dynamic cache fields during sessions",
+    "installed_cursor_checks": {
+      "cursor_cli_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "cursor_hooks_present": "pass",
+      "cursor_ide_behavior": "BLACK_BOX_NOT_VERIFIED",
+      "cursor_plugin_present": "pass",
+      "global_skill_tree_present": "pass",
+      "payload_present": "pass"
+    },
+    "installed_skill_sha256": "d892a90fdb7c455367d870e5b47f454a422d578109919d93c9a68eb5fd0beee9",
+    "installer_contract": {
+      "new_target_or_flag": false,
+      "repeat_install_action": "skipped",
+      "root_skill_content_verified": true,
+      "stale_local_entry_replaced": true,
+      "target": "cursor:<language>"
+    },
+    "tests": {
+      "full": "312 passed, 78 subtests",
+      "git_diff_check": "passed",
+      "golden_snapshots": "24 passed",
+      "targeted": "93 passed, 27 subtests",
+      "version_consistency": "passed"
+    }
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:1dd10d17b6cba52a06ae75d3709e34103b25b187a46107e00b3372495cd3a592",
+    "receipt_id": "exec_003",
+    "scope": "Cursor IDE and local Agent CLI one-install productization"
+  },
+  "timestamp": "2026-08-29T14:38:42+00:00",
+  "verdict": "cursor_cli_one_install_productized"
+}

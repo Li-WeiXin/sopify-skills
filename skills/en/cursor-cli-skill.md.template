@@ -1,0 +1,23 @@
+---
+name: sopify
+description: Top-level entry for Sopify managed workflows in Cursor Agent CLI. Use it for .sopify, ~go, requirements analysis, solution design, development, plan continuation or resumption, and finalize or closeout requests; once selected, first load only this Skill and the installed Plugin Rule without parallel business reads or other tools. Ordinary software questions and unmanaged quick fixes do not require it.
+---
+
+# Sopify CLI Top-Level Entry
+
+This Skill adds a managed-first entry for Cursor Agent CLI. It only loads the installed Sopify protocol and routes phase Skills; it does not copy the protocol or replace a Plugin Rule already loaded by Cursor IDE.
+
+## Entry steps
+
+1. If the current context already contains the `Sopify Cursor IDE Entry` heading and the five intents `consult_readonly`, `quick_fix`, `new_plan`, `continue_plan`, and `finalize`, follow that protocol without reading it again.
+2. Otherwise, after loading this Skill, read only `~/.cursor/plugins/local/sopify/rules/sopify.mdc` next. Do not read business files or call other tools in parallel. Read the file for real rather than merely claiming to reference it; treat its frontmatter as Cursor metadata and its body as the top-level Sopify protocol for this conversation.
+3. Classify the current request using that protocol, then read the relevant phase Skill, knowledge-base guidance, shared writing guidance, and output contract under `~/.cursor/skills/sopify/` only as needed.
+4. If the Plugin Rule is missing or unreadable, stop Sopify routing and ask the user to rerun the Cursor installer for the current language. Do not substitute a same-named Skill from `~/.claude`, `~/.codex`, or the project.
+
+## Boundaries
+
+- Automatic selection is model-driven and best-effort. Claim that Sopify was entered only after this Skill or the Plugin Rule was actually read.
+- Ordinary software questions and unmanaged quick fixes do not have to trigger this Skill. Never pretend that an unmatched managed request consumed Sopify.
+- Intent classification, scoring, the four-step protocol, knowledge-base policy, output, and writer boundaries remain authoritative in the installed Plugin Rule and phase Skills; this file does not duplicate them.
+- If an authorized action expands into new user-level or system-level persistence or deletion, explain the added impact and wait for confirmation again.
+- Do not modify the Cursor Plugin Rule, Hooks, settings, CLI configuration, proxy, model, account, API key, keychain, or MCP.
