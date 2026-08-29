@@ -1,0 +1,39 @@
+{
+  "evidence": {
+    "correction": {
+      "cursor_installer_writes_root_skill_separately": true,
+      "en_source": "skills/en/cursor-cli-skill.md.template",
+      "non_cursor_negative_hosts": [
+        "codex",
+        "claude",
+        "qoder"
+      ],
+      "shared_tree_golden_restored": true,
+      "shared_tree_root_skill_present": false,
+      "zh_source": "skills/zh/cursor-cli-skill.md.template"
+    },
+    "cursor_audit": {
+      "dispatch_id": "ctx_750e36ccddfc",
+      "finding": "Cursor-only root Skill was placed in the shared host Skill tree",
+      "message_id": "msg_63e9bc828252",
+      "verdict": "not_accepted"
+    },
+    "installed_skill_sha256": "d892a90fdb7c455367d870e5b47f454a422d578109919d93c9a68eb5fd0beee9",
+    "repeat_install_action": "skipped",
+    "tests": {
+      "focused": "73 passed, 30 subtests",
+      "full": "313 passed, 81 subtests",
+      "git_diff_check": "passed"
+    }
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:1dd10d17b6cba52a06ae75d3709e34103b25b187a46107e00b3372495cd3a592",
+    "receipt_id": "exec_004",
+    "scope": "cross-host isolation correction",
+    "verifier_host": "cursor"
+  },
+  "timestamp": "2026-08-29T14:49:30+00:00",
+  "verdict": "cursor_cli_entry_isolated_from_shared_host_tree"
+}

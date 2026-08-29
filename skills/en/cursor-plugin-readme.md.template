@@ -1,6 +1,6 @@
 # Sopify
 
-Sopify is an adaptive workflow layer for Cursor IDE. It routes each request to the smallest appropriate path—read-only consultation, quick fix, analysis, design, or managed development—while keeping evidence and project-state boundaries explicit.
+Sopify is an adaptive workflow layer for Cursor IDE and local Agent CLI. It routes each request to the smallest appropriate path—read-only consultation, quick fix, analysis, design, or managed development—while keeping evidence and project-state boundaries explicit.
 
 ## Use Sopify
 
@@ -8,12 +8,13 @@ Describe the goal naturally. Sopify uses the current repository's instructions a
 
 ## How it works
 
-- **Always Rule** classifies intent and routes the request.
+- **IDE Always Rule** classifies intent and routes requests in Cursor IDE.
+- **CLI top-level Skill** reads the same Rule for managed requests in local Agent CLI; model selection is best-effort.
 - **Skills** provide the phase-specific procedures.
 - **User Hooks** guard protocol state and receipt files against obvious direct writes; they are not a security sandbox.
 
 ## Support boundary
 
-- Cursor IDE is the automatic semantic entry. Cursor Agent CLI uses the installed Skills manually.
-- Support remains `BASELINE_SUPPORTED`: the primary IDE path has observable evidence, but automatic CLI entry, Cloud Agents, and identical behavior across models are not promised.
+- Cursor IDE uses the Always Rule. Cursor Agent CLI installs a managed-first top-level Skill by default and reuses the same phase Skills, payload, and user Hooks.
+- Support remains `BASELINE_SUPPORTED`: IDE and CLI evidence stay separate, and Sopify does not promise that every ordinary request selects the top-level Skill, Cloud Agents, or identical behavior across models.
 - Sopify does not modify Cursor settings, proxy, model, account, API keys, keychain, or MCP configuration. Cloud Agents are out of scope.

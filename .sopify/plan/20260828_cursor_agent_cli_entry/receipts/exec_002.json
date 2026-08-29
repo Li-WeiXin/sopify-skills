@@ -1,0 +1,25 @@
+{
+  "evidence": {
+    "cli_config_note": "Cursor Agent later refreshed its own dynamic CLI cache; this is not attributed to the Sopify installer.",
+    "cli_config_sha256_before_and_immediately_after_installer": "406ef6519b0fbd8bca8f8e36ea334c171833f91a7cd36aa6a31c0227b7ec496e",
+    "cursor_install_checks": {
+      "cursor_hooks_present": "pass",
+      "cursor_plugin_present": "pass",
+      "global_skill_tree_present": "pass",
+      "payload_present": "pass"
+    },
+    "installed_skill_sha256": "d892a90fdb7c455367d870e5b47f454a422d578109919d93c9a68eb5fd0beee9",
+    "installed_sopify_version": "2026-08-22.134737",
+    "skill_validation": "passed",
+    "stale_top_level_skill_copies": 0
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:11479834b277811893455f73d63e30144d99ac34a9ec0e7bfa5a012ef0052208",
+    "receipt_id": "exec_002",
+    "scope": "local Cursor CLI Skill update"
+  },
+  "timestamp": "2026-08-29T14:30:38+00:00",
+  "verdict": "local_cli_skill_updated"
+}

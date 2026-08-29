@@ -441,7 +441,7 @@ P4b 减重和 P4c 宿主消费治理的红线边界。只冻结 artifact / schem
 
 > **未列入面默认可删**：`state/sessions/*`、`state/last_route.json`、runtime 内部模块边界、route name 全集、output 渲染文案措辞均为 runtime 内部实现，不在 keep-list 内。P4b 减重时可自由处置。
 
-`host_support` 只声明官方适配器能把 Skill 语义交付到对应宿主的支持界面并由宿主消费。它不等同于原生 Skill discovery，也不证明该宿主已经完成 E2E；支持等级、已验证能力和入口形态继续由 `HostCapability` 表达。当前五个内置 Skill 面向 `codex / claude / qoder / copilot / cursor`，其中 Copilot 通过单文件展开消费，Cursor IDE 通过用户 Plugin Rule 与全局 Skill 树拆分消费；Agent CLI 只保留手工 Skill 与用户 Hook 兼容面。
+`host_support` 只声明官方适配器能把 Skill 语义交付到对应宿主的支持界面并由宿主消费。它不等同于原生 Skill discovery，也不证明该宿主已经完成 E2E；支持等级、已验证能力和入口形态继续由 `HostCapability` 表达。当前五个内置阶段 Skill 面向 `codex / claude / qoder / copilot / cursor`，其中 Copilot 通过单文件展开消费；Cursor IDE 通过用户 Plugin Rule 进入，本地 Agent CLI 默认安装 managed-first 顶层 Skill，选中后读取同一 Rule，并与 IDE 共用阶段 Skill 树、payload 与用户 Hooks。CLI 模型选择属于 best-effort，安装事实不替代行为证据。
 
 
 ## Output Rendering Audit — *[pre-P8 legacy reference]*
@@ -504,7 +504,7 @@ output.py 渲染层逐字段分类。只做分类，不做改造决策（改造�
 | Claude | `protocol_verified` | `install.sh --target claude:zh-CN` | CONTINUATION + INTERACTION + AUDIT | 已验证 |
 | Qoder | `protocol_verified` | `install.sh --target qoder` | CONTINUATION + INTERACTION + AUDIT | W3.1-W3.3 已验证 |
 | Copilot | `baseline_supported` | `install.sh --target copilot` | PROMPT_ONLY | Prompt-only |
-| Cursor | `baseline_supported` | `install.sh --target cursor` | PROMPT_ONLY + HOOKS | IDE user Plugin Rule + global Skills/payload + user-level `~/.cursor/hooks.json`; observable IDE baseline evidence, CLI manual Skills only |
+| Cursor | `baseline_supported` | `install.sh --target cursor` | PROMPT_ONLY + HOOKS | IDE user Plugin Rule + managed-first CLI entry + shared Skills/payload + user-level `~/.cursor/hooks.json`; IDE/CLI behavior evidence remains separate |
 
 ### 契约消费矩阵（P8 2-file state model）
 

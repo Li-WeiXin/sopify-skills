@@ -109,7 +109,7 @@ Sopify 不默认安装或运行验证器。只用 Sopify、使用其他 Verifier
 | Claude | PROTOCOL_VERIFIED | `install.sh --target claude:zh-CN` | 全能力接续 |
 | Qoder | PROTOCOL_VERIFIED | `install.sh --target qoder` | 已在 Qoder CLI 验证 |
 | Copilot | BASELINE_SUPPORTED | `install.sh --target copilot` | 仅 prompt；payload 升级计划中 |
-| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor:zh-CN` | IDE 用户 Plugin + 全局 Skills/payload + 用户 Hooks |
+| Cursor | BASELINE_SUPPORTED | `install.sh --target cursor:zh-CN` | IDE 用户 Plugin + managed-first CLI 入口 + 共享 Skills/payload/Hooks |
 
 ## 附录：Plan 生命周期
 

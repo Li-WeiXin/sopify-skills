@@ -139,11 +139,11 @@ Copilot reads project-level instruction files across its supported surfaces
 Full trigger wiring (equivalent to Codex/Claude `~go`) is coming in a future
 release.
 
-### Cursor IDE (optional Agent CLI)
+### Cursor IDE and local Agent CLI
 
 Cursor IDE uses one user-level Plugin rule. The same installation provides a
-global Skill/payload tree under `~/.cursor/` and user-level hooks in
-`~/.cursor/hooks.json`:
+managed-first Agent CLI entry, the shared Skill/payload tree under `~/.cursor/`,
+and user-level hooks in `~/.cursor/hooks.json`:
 
 ```bash
 curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/install.sh | bash -s -- --target cursor:en-US
@@ -157,11 +157,12 @@ created during install. `--with-evidentloop` is not supported for Cursor in
 this release. The Plugin Rule uses valid `.mdc` frontmatter with
 `alwaysApply: true` and routes to `~/.cursor/skills/sopify`.
 
-The tested Agent CLI does not automatically load this user Plugin Rule.
-Automatic entry for Agent CLI and Cloud Agent is outside this release. No
-launcher, project Rule, prompt injector, or runtime is added. See
-[Cursor host acceptance](./cursor-host.md). The current tier remains
-`BASELINE_SUPPORTED`.
+Agent CLI does not load the user Plugin Rule by itself. The installed top-level
+`~/.cursor/skills/sopify/SKILL.md` is a managed-first, model-selected entry that
+reads the Rule before routing phase Skills. Selection is best-effort; ordinary
+questions do not have to trigger it, and Cloud Agent remains outside this
+release. No launcher, project Rule, prompt injector, or runtime is added. See
+[Cursor host acceptance](./cursor-host.md). The tier remains `BASELINE_SUPPORTED`.
 
 ## Verify Setup
 

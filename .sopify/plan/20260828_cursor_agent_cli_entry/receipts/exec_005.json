@@ -1,0 +1,21 @@
+{
+  "evidence": {
+    "branch": "feat/cursor-agent-cli-entry",
+    "commit_authorized": true,
+    "cursor_final_review": "accepted with no remaining findings",
+    "finalize_authorized": false,
+    "last_full_test_result": "313 passed, 81 subtests",
+    "merge_authorized": false,
+    "push_authorized": true,
+    "release_authorized": false
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:9a481e9161773c7d3ccb43aba20c0242e7e6dc85fc9a1861d93abdaf8746bf40",
+    "receipt_id": "exec_005",
+    "scope": "local commit and feature-branch push authorization"
+  },
+  "timestamp": "2026-08-29T15:03:13+00:00",
+  "verdict": "feature_branch_delivery_authorized"
+}

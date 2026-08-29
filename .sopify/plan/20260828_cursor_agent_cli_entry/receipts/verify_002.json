@@ -1,0 +1,31 @@
+{
+  "evidence": {
+    "correction": "moved the Skill and Plugin Rule first-read constraint into the frontmatter description",
+    "first_cursor_audit": {
+      "dispatch_id": "ctx_2ffacf6dfec5",
+      "finding": "initial read-order constraint was absent from description",
+      "verdict": "not_accepted"
+    },
+    "forward_observation": [
+      "Cursor selected the sopify root Skill for the managed audit request",
+      "the installed Plugin Rule was read before business execution",
+      "the reviewing Cursor worker made no task-file mutations"
+    ],
+    "installed_skill_sha256": "d892a90fdb7c455367d870e5b47f454a422d578109919d93c9a68eb5fd0beee9",
+    "second_cursor_audit": {
+      "dispatch_id": "ctx_138ea9a1430b",
+      "message_id": "msg_d5529bd8e813",
+      "verdict": "accepted"
+    }
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:11479834b277811893455f73d63e30144d99ac34a9ec0e7bfa5a012ef0052208",
+    "receipt_id": "verify_002",
+    "scope": "local Cursor CLI Skill independent review",
+    "verifier_host": "cursor"
+  },
+  "timestamp": "2026-08-29T14:30:38+00:00",
+  "verdict": "accept_local_cli_skill_after_cursor_review"
+}

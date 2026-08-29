@@ -91,6 +91,7 @@ class HostAdapter:
     def global_skill_paths(self, home_root: Path) -> tuple[Path, ...]:
         skills_root = self.destination_root(home_root) / "skills" / "sopify"
         return (
+            skills_root / "SKILL.md",
             skills_root / "analyze" / "SKILL.md",
             skills_root / "design" / "SKILL.md",
             skills_root / "develop" / "SKILL.md",

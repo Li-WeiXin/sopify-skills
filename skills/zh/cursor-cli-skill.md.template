@@ -1,0 +1,23 @@
+---
+name: sopify
+description: Cursor Agent CLI 中 Sopify 托管工作流的顶层入口。请求涉及 .sopify、~go、需求分析、方案设计、开发实施、继续、接续、恢复方案或 finalize、收口时优先使用；命中后第一步只加载本 Skill 和已安装 Plugin Rule，不与业务读取或其他工具并行。普通软件咨询和非托管 quick fix 不强制触发。
+---
+
+# Sopify CLI 顶层入口
+
+此 Skill 为 Cursor Agent CLI 补充 managed-first 入口。它只负责加载当前安装的 Sopify 协议并路由阶段 Skill，不复制协议正文，也不替换 Cursor IDE 已加载的 Plugin Rule。
+
+## 入口步骤
+
+1. 如果当前上下文已包含标题 `Sopify Cursor IDE 入口`，以及 `consult_readonly`、`quick_fix`、`new_plan`、`continue_plan`、`finalize` 五类意图，直接遵循该协议，不重复读取。
+2. 否则，加载本 Skill 后的下一步只读取 `~/.cursor/plugins/local/sopify/rules/sopify.mdc`；不要并行读取业务文件或调用其他工具。必须实际读取，不得只声称已参考；frontmatter 是 Cursor 元数据，正文是当前会话的顶层 Sopify 协议。
+3. 先按该协议分类本轮意图，再按需读取 `~/.cursor/skills/sopify/` 下对应的阶段 Skill、KB、共享写作规范与输出契约。
+4. Plugin Rule 缺失或不可读时停止 Sopify 路由，提示用户重新运行当前语言的 Cursor 安装；不得用 `~/.claude`、`~/.codex` 或项目中的同名 Skill 顶替。
+
+## 边界
+
+- 自动选择由 Cursor 模型决定，属于 best-effort。只有实际读取本 Skill 或 Plugin Rule 后，才可以声称本轮已进入 Sopify。
+- 普通软件咨询和非托管 quick fix 不强制触发；managed 请求未命中时，不得伪装成已消费 Sopify。
+- 意图分类、评分门、四步协议、KB、输出和 writer 边界均以已安装 Plugin Rule 与阶段 Skills 为准，本文件不重复定义。
+- 如果已授权动作扩大为新的用户级或系统级持久化、删除操作，先说明新增影响并重新等待确认。
+- 不修改 Cursor Plugin Rule、Hooks、settings、CLI config、代理、模型、账号、API Key、钥匙串或 MCP。

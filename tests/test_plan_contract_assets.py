@@ -160,7 +160,9 @@ class PlanContractAssetTests(unittest.TestCase):
                 self.assertIn("consult_readonly", rendered)
                 self.assertIn("IDE Entry" if language == "en" else "IDE 入口", rendered)
                 self.assertIn(
-                    "does not automatically load" if language == "en" else "不会自动加载",
+                    "does not load a Plugin Rule by itself"
+                    if language == "en"
+                    else "不会自行加载 Plugin Rule",
                     rendered,
                 )
                 self.assertIn("~/.claude", rendered)
