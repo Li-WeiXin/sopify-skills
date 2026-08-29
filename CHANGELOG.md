@@ -6,18 +6,20 @@ Format: Summary → Changed → Plan Packages. File-level details live in `git l
 
 ## [Unreleased]
 
+## [2026-08-30.001152] - 2026-08-30
+
 ### Summary
 
 Extended the existing Cursor user-scope installation so one install covers the IDE and local Agent CLI.
 
 ### Changed
 
-- **Cursor Agent CLI**: Added bilingual top-level Skills for plan, development, and resume requests. The CLI selects the entry when relevant, reads the installed Plugin Rule, and keeps IDE/CLI behavior evidence separate.
+- **Cursor Agent CLI**: Added bilingual top-level Skills for plan, development, resume, and closeout requests. The CLI selects the entry when relevant, reads the installed Plugin Rule, and keeps IDE/CLI behavior evidence separate.
 - **Cursor installation**: The existing `cursor:<language>` target now installs and verifies the CLI entry, replaces stale local copies on reinstall, and keeps settings, proxy, model, account, and Cloud Agent out of scope.
 
 ### Plan Packages
 
-- `20260828_cursor_agent_cli_entry` → implementation and independent Cursor review complete; explicit finalize remains separate.
+- `20260828_cursor_agent_cli_entry` → archived after PR #73 merge and independent Cursor release-gate approval; stable release follows this entry.
 
 ## [2026-08-22.134737] - 2026-08-22
 

@@ -2,7 +2,7 @@
 description: "Sopify workflow entry for Cursor IDE"
 alwaysApply: true
 ---
-<!-- SOPIFY_VERSION: 2026-08-22.134737 -->
+<!-- SOPIFY_VERSION: 2026-08-30.001152 -->
 
 # Sopify Cursor IDE 入口
 

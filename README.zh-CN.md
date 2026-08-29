@@ -6,7 +6,7 @@
 
 [![许可证](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](./LICENSE)
 [![文档](https://img.shields.io/badge/docs-CC%20BY%204.0-green.svg?style=for-the-badge)](./LICENSE-docs)
-[![版本](https://img.shields.io/badge/version-2026--08--22.134737-orange.svg?style=for-the-badge)](#版本历史)
+[![版本](https://img.shields.io/badge/version-2026--08--30.001152-orange.svg?style=for-the-badge)](#版本历史)
 [![欢迎PR](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](./CONTRIBUTING_CN.md)
 
 [![Codex](https://img.shields.io/badge/host-Codex-4A9EFF.svg?style=for-the-badge)](#快速开始)

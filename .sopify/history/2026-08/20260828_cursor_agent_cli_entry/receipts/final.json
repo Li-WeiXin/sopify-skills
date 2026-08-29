@@ -1,0 +1,26 @@
+{
+  "evidence": {
+    "cursor_release_gate": {
+      "message_id": "msg_ab078d4ebc12",
+      "verdict": "accepted"
+    },
+    "feature_head": "e1a91a360d0c0a76b54d147fdf5e0316812e75df",
+    "merge_commit": "27efc521c43a9d6b5db528add648f6ae12f7f013",
+    "pull_request": 73,
+    "release_status": "authorized and pending",
+    "tests": {
+      "full": "313 passed, 81 subtests",
+      "github_hard_gate": "100 passed, 4 subtests",
+      "release_preflight": "passed"
+    }
+  },
+  "provenance": {
+    "host": "codex",
+    "plan_id": "20260828_cursor_agent_cli_entry",
+    "plan_version": "sha256:9a481e9161773c7d3ccb43aba20c0242e7e6dc85fc9a1861d93abdaf8746bf40",
+    "receipt_id": "final",
+    "scope": "post-merge explicit finalize before stable release"
+  },
+  "timestamp": "2026-08-29T16:11:12+00:00",
+  "verdict": "finalized"
+}
