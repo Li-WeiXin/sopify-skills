@@ -1,6 +1,6 @@
 # Cursor 宿主接入
 
-支持本地 Cursor IDE 与 Agent CLI，Cloud Agent 不在本期范围。IDE 通过用户级 Always Plugin Rule 进入；Agent CLI 默认安装 managed-first 顶层 Skill，被模型选中后实际读取同一 Rule。CLI 自动选择属于 best-effort，支持档位保持 `BASELINE_SUPPORTED`；本期不增加 launcher、项目 Rule 或 runtime，也不把安装存在外推为跨模型稳定性或完整协议认证。
+Cursor 安装一次即可支持本地 IDE 与 Agent CLI，Cloud Agent 不在本期范围。IDE 始终通过用户级 Plugin Rule 进入；CLI 在方案、开发、继续和收口等 Sopify 请求中按需选择顶层 Skill，再读取同一 Rule。普通问答不强制经过该入口。支持档位保持 `BASELINE_SUPPORTED`；本期不增加 launcher、项目 Rule 或 runtime，也不把安装成功外推为跨模型稳定性或完整协议认证。
 
 ## 安装面
 
@@ -13,7 +13,7 @@ curl -fsSL https://github.com/evidentloop/sopify/releases/latest/download/instal
 安装一次，管理四个用户级落点：
 
 - Plugin：`~/.cursor/plugins/local/sopify/.cursor-plugin/plugin.json`、`README.md` 与 `rules/sopify.mdc`。README 渐进介绍用途与边界；薄 Always Rule 是 IDE 的语义入口。
-- Skills：`~/.cursor/skills/sopify/SKILL.md` 是 Agent CLI 的 managed-first 顶层入口；同目录下的 `analyze`、`design`、`develop`、`kb`、`templates` 和共享 references 由 IDE 与 CLI 共用。
+- Skills：`~/.cursor/skills/sopify/SKILL.md` 是 Agent CLI 的方案/开发/接续入口；同目录下的 `analyze`、`design`、`develop`、`kb`、`templates` 和共享 references 由 IDE 与 CLI 共用。
 - Payload：`~/.cursor/sopify/`，包含版本化 bundle 与 Hook helper。
 - Hooks：合并到 `~/.cursor/hooks.json`；不写仓库级 hooks。
 
@@ -61,10 +61,10 @@ IDE 与 CLI 分开记录，不互相外推：
 
 1. IDE baseline 已有可观察证据：已安装 Rule 含 `alwaysApply: true`，consult 实际读取 Cursor 写作规范并保持只读；Analyze 读取 Cursor Skill 并执行评分脚本；有限选项澄清留下 AskQuestion tool use 与 `Tool not found` 文本回退，结构化问卷 UI 仅作为人工观察，transcript 不含 tool result 或选项回传；managed 场景按 Analyze → Design → Develop 推进，经 `sopify_writer` 写 state、handoff 与 receipts；明显 Shell 直写 machine truth 被 Hook 拒绝且文件哈希不变。
 2. IDE 未验证边界：AskQuestion 是否跨模型稳定提供、独立 `sessionStart` 行为与显式 finalize。本期依赖文本追问回退和现有协议边界，不把这些项目作为 baseline 发布阻塞。
-3. CLI 已观察到 managed 审计请求自动选择顶层 Skill、读取 Plugin Rule，并在修正 description 读取顺序后通过独立 Cursor 复审。该证据只证明当前本机路径，不承诺每个普通请求、所有模型或所有机器都会自动选择。
+3. CLI 已观察到方案审计请求自动选择顶层 Skill、读取 Plugin Rule，并在修正 description 读取顺序后通过独立 Cursor 复审。该证据只证明当前本机路径，不承诺每个普通请求、所有模型或所有机器都会自动选择。
 
 Cursor CLI 不会自行加载用户 Plugin Rule；Sopify 通过默认安装的顶层 Skill 显式读取该 Rule，不依赖 `--plugin-dir`、项目 Rule 或 prompt injector。Skill 发现和模型选择仍是宿主行为，因此 Doctor 继续把安装事实与 `cursor_cli_behavior` 黑盒证据分开。
 
-一次临时仓库黑盒已观察到四步读链、managed develop 与 `sopify_writer` 写回；本机顶层 Skill 复审又观察到 managed 请求自动选择和 Rule 消费。显式 finalize、跨模型一致性与可移植黑盒仍未完整认证；Doctor 的行为项继续保持静态 `BLACK_BOX_NOT_VERIFIED`。
+一次临时仓库黑盒已观察到四步读链、受管开发与 `sopify_writer` 写回；本机顶层 Skill 复审又观察到方案类请求按需选择入口并读取 Rule。显式 finalize、跨模型一致性与可移植黑盒仍未完整认证；Doctor 的行为项继续保持静态 `BLACK_BOX_NOT_VERIFIED`。
 
 官方依据：[`Cursor Plugins`](https://cursor.com/docs/plugins)、[`Plugin format`](https://cursor.com/docs/reference/plugins)、[`Cursor Rules`](https://cursor.com/docs/rules)、[`Cursor Agent Skills`](https://cursor.com/docs/skills)、[`Cursor Hooks`](https://cursor.com/docs/hooks)、[`Cursor CLI`](https://cursor.com/docs/cli/using)。

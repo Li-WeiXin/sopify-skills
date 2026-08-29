@@ -137,7 +137,7 @@ Get-Content sopify-install.ps1 | more
 | Claude | PROTOCOL_VERIFIED | `claude:zh-CN` / `claude:en-US` | 全能力接续 |
 | Qoder | PROTOCOL_VERIFIED | `qoder` | 已在 Qoder CLI 验证 |
 | Copilot | BASELINE_SUPPORTED | `copilot:zh-CN` / `copilot:en-US` | 仅 prompt；payload 升级计划中 |
-| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor:zh-CN` / `cursor:en-US` | IDE 用户 Plugin + managed-first CLI 入口 + 共享 Skills/payload/Hooks |
+| [Cursor](docs/cursor-host.md) | BASELINE_SUPPORTED | `cursor:zh-CN` / `cursor:en-US` | 一次安装支持 IDE 与本地 CLI；CLI 方案/开发/接续/收口入口按需触发 |
 
 可用 `--workspace <path>` 指定目标仓库，`--language <lang>` 控制输出语言；Cursor 为用户级一次安装，不需要 `--workspace`。
 
