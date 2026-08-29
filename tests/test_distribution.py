@@ -249,7 +249,7 @@ class DistributionFacadeTests(unittest.TestCase):
             readme_path = rule_path.parent.parent / "README.md"
             self.assertIn(f"用户 Plugin 规则：{rule_path}", rendered)
             self.assertTrue(readme_path.is_file())
-            self.assertIn("自适应工作流层", readme_path.read_text(encoding="utf-8"))
+            self.assertIn("Cursor IDE 与本地 Agent CLI", readme_path.read_text(encoding="utf-8"))
             self.assertIn("未修改任何项目目录", rendered)
             self.assertIn("Developer: Reload Window", rendered)
             self.assertIn("确认 Sopify Plugin 及其 Always Rule 已启用", rendered)
