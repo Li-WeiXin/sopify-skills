@@ -45,11 +45,19 @@ No new editor, no new CLI. Install into the host you already use — Codex, Clau
 
 [See the workflow diagram, checkpoints, and resume flow →](./docs/how-sopify-works.en.md)
 
-## See It In Action
+## Sopify in a Real Codex Workflow
+
+This archived workflow shows Sopify running inside Codex, not a scripted terminal demo. A complex request became a tracked plan; an audit concern triggered a decision checkpoint; after the user approved a minimal fix, the verification evidence was recorded and the plan was archived.
 
 <p align="center">
-  <img src="./assets/demo-en.svg" alt="Sopify demo — Analysis on Claude Code, then resume on Codex CLI" width="900" />
+  <img src="./assets/readme-visuals/codex-dogfood.gif" alt="Sopify in a real Codex workflow: a request becomes a plan, an audit concern stops for the user's decision, and the minimal fix and verification evidence are recorded before archive" width="900" />
 </p>
+
+- **Plan first** — Codex did not start coding immediately; it first captured the goal, boundaries, and verification steps in a tracked plan.
+- **Stop for a decision** — the first audit found one concern; work paused for the user, then only a minimal identity check was added.
+- **Close with evidence** — the second audit found no open risk; 5 protocol checks and 55 targeted tests with 48 subtests were recorded before archive.
+
+The real task was an optional verifier integration. The animation explains how Sopify managed it; the archived files show what happened: [plan](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/plan.md) · [verification receipt](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/receipts/verify_001.json) · [final receipt](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/receipts/final.json).
 
 ## Quick Start
 

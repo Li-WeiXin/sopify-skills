@@ -45,11 +45,19 @@ Sopify 把方案和验证收据保存在 `.sopify/` 中，作为可纳入 git �
 
 [查看工作流图、checkpoint 与恢复流程 →](./docs/how-sopify-works.md)
 
-## 实战演示
+## Sopify 在真实 Codex 任务中如何运行
+
+下面展示的是 Sopify 在一次真实 Codex 任务中的运行过程，不是编排好的终端演示。复杂需求先沉淀为方案；审计发现问题时流程停车；用户裁定后再做最小修正，并把验证结果写入收据后归档。
 
 <p align="center">
-  <img src="./assets/demo-en.svg" alt="Sopify 演示 — 在 Claude Code 分析设计，然后在 Codex CLI 恢复开发" width="900" />
+  <img src="./assets/readme-visuals/codex-dogfood.gif" alt="Sopify 在真实 Codex 任务中的运行过程：需求形成方案，审计发现问题后等待用户裁定，最小修正和验证证据写入收据后再归档" width="900" />
 </p>
+
+- **先形成方案** — Codex 没有直接改代码，而是先把目标、边界和验证步骤写入可追踪方案。
+- **发现问题就停车** — 首次审计发现一项风险；流程等待用户裁定，随后只补最薄的身份校验。
+- **有证据再收口** — 复审确认没有开放风险；最终收据记录 5 项协议检查、55 项定向测试和 48 项子测试，随后才归档。
+
+真实任务是一次可选验证器接入。动效解释 Sopify 如何管理这项工作，归档文件记录实际过程：[方案](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/plan.md) · [验证收据](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/receipts/verify_001.json) · [最终收据](./.sopify/history/2026-07/20260718_evidentloop_optional_audit_integration/receipts/final.json)。
 
 ## 快速开始
 

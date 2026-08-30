@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "mode": "architecture",
+  "template_type": "architecture",
+  "style": 7,
+  "motion_scene": "token-stream",
+  "quality_profile": "showcase",
+  "width": 960,
+  "height": 700,
+  "title": "Sopify in Codex · 真实运行流程",
+  "subtitle": "plan / 方案 → decision / 用户裁定 → evidence / 证据收口",
+  "caption": "Animated reconstruction from archived plan and receipts. The animation explains the flow; linked artifacts are the evidence. / 基于归档方案与收据的动效重构；动效解释流程，链接文件才是证据。",
+  "alt": "Sopify 在真实 Codex 任务中的运行过程：需求形成方案，审计发现问题后等待用户裁定，最小修正和验证证据写入收据后再归档。",
+  "containers": [
+    { "id": "entry", "x": 40, "y": 120, "width": 880, "height": 110, "label": "PLAN / 方案", "stroke": "#e2e8f0", "fill": "none" },
+    { "id": "runtime", "x": 40, "y": 280, "width": 880, "height": 130, "label": "BUILD / 实施", "stroke": "#e2e8f0", "fill": "none" },
+    { "id": "delivery", "x": 40, "y": 450, "width": 880, "height": 140, "label": "DECIDE / 裁定", "stroke": "#e2e8f0", "fill": "none" }
+  ],
+  "nodes": [
+    { "id": "app", "kind": "rect", "x": 80, "y": 156, "width": 180, "height": 54, "type_label": "REQUEST", "label": "User request / 用户需求", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true },
+    { "id": "sdk", "kind": "double_rect", "x": 370, "y": 156, "width": 220, "height": 54, "type_label": "CODEX", "label": "Codex plan / Codex 方案", "fill": "#ffffff", "stroke": "#10a37f" },
+    { "id": "prompt", "kind": "rect", "x": 80, "y": 340, "width": 180, "height": 50, "type_label": "PROJECT", "label": "plan.md", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true },
+    { "id": "model", "kind": "double_rect", "x": 370, "y": 340, "width": 220, "height": 50, "type_label": "DEVELOP", "label": "Implement / 实施", "fill": "#ffffff", "stroke": "#10a37f" },
+    { "id": "tools", "kind": "rect", "x": 700, "y": 340, "width": 180, "height": 50, "type_label": "EVIDENCE", "label": "Tests + release / 测试发布", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true },
+    { "id": "formatter", "kind": "rect", "x": 80, "y": 510, "width": 180, "height": 60, "type_label": "AUDIT", "label": "Audit report / 审计报告", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true },
+    { "id": "observability", "kind": "rect", "x": 390, "y": 510, "width": 180, "height": 60, "type_label": "CHECKPOINT", "label": "User decision / 用户裁定", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true },
+    { "id": "release", "kind": "rect", "x": 700, "y": 510, "width": 180, "height": 60, "type_label": "TRACE", "label": "Receipt + archive / 收据归档", "fill": "#ffffff", "stroke": "#dce5e3", "flat": true }
+  ],
+  "arrows": [
+    { "id": "connect", "source": "app", "target": "sdk", "source_port": "right", "target_port": "left", "flow": "control", "motion_role": "connect", "motion_stage": 1, "motion_order": 0, "label": "request / 需求" },
+    { "id": "prepare", "source": "sdk", "target": "prompt", "source_port": "bottom", "target_port": "top", "flow": "read", "motion_role": "prepare", "motion_stage": 2, "motion_order": 0, "label": "materialize / 落盘" },
+    { "id": "invoke", "source": "prompt", "target": "model", "source_port": "right", "target_port": "left", "flow": "control", "motion_role": "invoke", "motion_stage": 3, "motion_order": 0, "label": "confirm / 确认" },
+    { "id": "tool-call", "source": "model", "target": "tools", "source_port": "right", "target_port": "left", "flow": "read", "motion_role": "tool-call", "motion_stage": 4, "motion_order": 0, "label": "test + release / 验证发布" },
+    { "id": "stream", "source": "model", "target": "formatter", "source_port": "bottom", "target_port": "top", "flow": "control", "motion_role": "token-stream", "motion_stage": 4, "motion_order": 1, "label": "audit / 审计" },
+    { "id": "measure", "source": "formatter", "target": "observability", "source_port": "right", "target_port": "left", "flow": "feedback", "motion_role": "measure", "motion_stage": 5, "motion_order": 1, "label": "review / 裁定" },
+    { "id": "govern", "source": "tools", "target": "release", "source_port": "bottom", "target_port": "top", "flow": "feedback", "motion_role": "govern", "motion_stage": 5, "motion_order": 0, "label": "gate / 门禁" },
+    { "id": "promote", "source": "observability", "target": "release", "source_port": "right", "target_port": "left", "flow": "feedback", "motion_role": "promote", "motion_stage": 6, "motion_order": 0, "label": "fix + record / 修正留痕" }
+  ],
+  "legend_orientation": "horizontal",
+  "legend_x": 48,
+  "legend_y": 625,
+  "legend_locked": true,
+  "legend": [
+    { "flow": "control", "label": "request / confirm / audit" },
+    { "flow": "read", "label": "plan / tests" },
+    { "flow": "feedback", "label": "decision / closeout" }
+  ],
+  "footer": "Animated reconstruction from archived plan and receipts · 动效解释流程，链接文件才是证据。",
+  "footer_x": 48,
+  "footer_y": 680
+}
